@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Gestion de la Blacklist</title>
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        body {
+            background-color: #0f0f0f;
+            color: #f0f0f0;
+            font-family: 'Segoe UI', sans-serif;
+            padding: 2rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #ffffff;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background-color: #1a1a1a;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            background-color: #2a2a2a;
+            margin: 0.5rem 0;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
+
+        form {
+            margin-top: 2rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        input[type="email"] {
+            padding: 0.6rem;
+            border: none;
+            border-radius: 6px;
+            background-color: #333;
+            color: #fff;
+            margin-bottom: 1rem;
+        }
+
+        button {
+            padding: 0.6rem;
+            background-color: #ff3c3c;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #e62e2e;
+        }
+
+        .status {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #00ff99;
+        }
+    </style>
+</head>
+
+<body>
+    <% if (user.id==1 || (user.badges && user.badges[staff])) { %>
+        <div class="container">
+            <h1>👮‍♂️ Gestion de la Blacklist</h1>
+            <% const startsWithVowel=/^[aeiouyAEIOUY]/.test(user.username); const prefix=startsWithVowel ? "qu’" : "que "; %>
+                <p>Connecté en tant <%= prefix %><strong><%= user.username %></strong></p>
+                <h2>📛 Emails bannis :</h2>
+                <ul>
+                    <% bannedEmails.forEach(email=> { %>
+                        <li>
+                            <%= email %>
+                        </li>
+                        <% }) %>
+                </ul>
+
+                <form id="blacklistForm">
+                    <input type="email" name="email" id="emailInput" placeholder="Email à bannir" required>
+                    <button type="submit">Ajouter à la blacklist</button>
+                </form>
+
+                <div class="status" id="statusMessage"></div>
+        </div>
+
+        <script>
+            document.getElementById('blacklistForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('emailInput').value.trim();
+                const res = await fetch('<%= url %>', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ email })
+                });
+
+                const data = await res.json();
+                const status = document.getElementById('statusMessage');
+
+                if (data.success) {
+                    status.textContent = "✅ Email ajouté à la blacklist. (refresh pour le voir)";
+                    status.style.color = "#00ff99";
+                } else {
+                    status.textContent = "❌ Erreur : " + (data.error || "Impossible d'ajouter l'email.");
+                    status.style.color = "#ff6666";
+                }
+            });
+        </script>
+        <% } %>
+</body>
+
+</html>

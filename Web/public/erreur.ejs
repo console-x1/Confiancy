@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erreur404</title>
+    <link rel="icon" href="./media/erreur.png">
+    <style>
+        body {
+            text-align: center;
+            background-color: #121212;
+            color: #f0f0f0;
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            position: relative;
+            width: 700px;
+        }
+        .image {
+            display: block;
+            width: 100%;
+            border-radius: 20px;
+            margin-bottom: 40px;
+        }
+        .text {
+            position: absolute;
+            top: 37%;
+            left: 66.6%;
+            transform: translate(-50%, -50%);
+            color: rgb(0, 0, 0);
+            font-size: 24px;
+            font-weight: bold;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+        }
+        button {
+            background-color: #3961e2;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0015ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img id="img" src="./media/erreur.png" alt="Image" class="image">
+        <p class="text">
+            <%= code %> - <%= description %>
+        </p>
+    </div>
+
+    <a id="home" href="./index.html">
+        <button type="button">
+            Retourner à l'accueil
+        </button>
+    </a>
+
+    <script>
+        const img = document.getElementById('img');
+        img.src = `${window.location.protocol.includes('http') ? 'http' : window.location.protocol}://${window.location.hostname + ":" + window.location.port}/media/erreur.png`;
+        const a = document.getElementById('home')
+        a.href = `${window.location.protocol.includes('http') ? 'http' : window.location.protocol}://${window.location.hostname + ":" + window.location.port}/index`;
+    </script>
+</body>
+</html>

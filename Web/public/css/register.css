@@ -1,0 +1,125 @@
+:root {
+  --primary: #2196F3;
+  --secondary: #0D47A1;
+  --text: #fff;
+  --bg: #0A1929;
+}
+
+/* Global styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--bg);
+    padding: 25px 0 25px 0;
+}
+
+canvas { 
+    display: block; 
+    z-index: -1;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+/* Container */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: auto;
+    width: auto;
+}
+
+/* Login box */
+.login-box {
+    background: linear-gradient(145deg, var(--secondary), var(--primary));
+    box-shadow: 10px 10px 20px #121212, -10px -10px 20px #3a3a3a;
+    border-radius: 15px;
+    padding: 40px;
+    width: 350px;
+    text-align: center;
+    max-width: 450px; /* Un peu plus large pour le formulaire d'inscription */
+}
+
+/* Logo */
+.logo {
+    width: 60px;
+    height: 60px;
+    background: none; /* Suppression du fond du logo */
+    border-radius: 50%;
+    margin: 0 auto 15px;
+}
+
+/* Title */
+.header {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--text);
+    margin-bottom: 20px;
+}
+
+/* Inputs */
+.input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: 1px solid #88888855;
+    background: #222;
+    color: var(--text);
+    outline: none;
+}
+
+.input-group {
+    margin-bottom: 1.2rem; /* Plus d'espace entre les champs */
+}
+
+/* Buttons */
+.button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 1.5rem;
+    border-radius: 8px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.sign-up {
+    background: var(--primary);
+    color: var(--text);
+    box-shadow: inset 2px 2px 5px var(--primary), inset -2px -2px 5px var(--primary);
+}
+
+/* Footer */
+.footer {
+    font-size: 0.9rem;
+    color: var(--text);
+    margin: 30px 0 0 0;
+}
+
+.link {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/* Responsive design */
+@media (max-width: 400px) {
+    .login-box {
+        width: 90%;
+        padding: 30px;
+    }
+}
+
+.checkbox-container {
+    justify-content: center; /* Centrage de "Rester connecté" */
+}

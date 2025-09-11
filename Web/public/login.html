@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion</title>
+    <link rel="stylesheet" href="./css/login.css">
+    <link rel="icon" href="./media/logoCircle.png">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="glass-effect glass-1"></div>
+        <div class="glass-effect glass-2"></div>
+        
+        <div class="login-box">
+            <a href="./index.html">
+            <img class="logo" src="./media/logo.png" alt="Logo">
+            </a>
+
+            <h1 class="header">Bienvenue</h1>
+            
+            <form class="form" id="loginForm">
+                <div class="input-group">
+                    <input type="email" id="email" name="email" class="input" placeholder="Email" required autocomplete="email">
+                </div>
+                
+                <div class="input-group">
+                    <input type="password" id="password" name="password" class="input" placeholder="Mot de passe" required autocomplete="current-password">
+                </div>
+                
+                <!--
+                <div class="checkbox-container" style="justify-content: center;">
+                    <input type="checkbox" id="remember" class="checkbox-input">
+                    <label for="remember" class="remember-me">Rester connecté</label>
+                </div>
+                -->
+                
+                <button type="submit" class="button">Se connecter</button>
+                
+                <div class="footer">
+                    <p>Pas encore de compte ?</p>
+                    <a href="./register.html" class="link">Créer un compte</a>
+                    <br><br>
+                    <p>Vous avez un connexion externe ?</p>
+                    <a href="./api/Oauth2/discord/login/getUrl" class="link">Se connecter via Discord</a><br>
+                    <a href="./api/Oauth2/github/login/getUrl" class="link">Se connecter via GitHub</a>
+                    <br><br>
+                    <a href="#" class="link">Mot de passe oublié ?</a>
+                </div>
+            </form>
+            <p id="errorMessage" class="error"></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const button = e.target.querySelector('.button');
+            button.style.transform = 'scale(0.95)';
+            setTimeout(() => button.style.transform = '', 150);
+        });
+    </script>
+    <script src="javascript/auth.js"></script>
+</body>
+</html>

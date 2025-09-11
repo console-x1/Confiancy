@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Tableau de bord</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    body {
+      background-color: #0f0f0f;
+      color: #f0f0f0;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background-color: #1a1a1a;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: #ffffff;
+    }
+
+    .info {
+      margin-bottom: 2rem;
+      font-size: 1.1rem;
+    }
+
+    .link-box {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    a {
+      display: inline-block;
+      padding: 0.8rem 1.2rem;
+      background-color: #3c3c3c;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: background-color 0.2s ease;
+    }
+
+    a:hover {
+      background-color: #555;
+    }
+
+    .linked {
+      color: #00ff99;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>👤 Tableau de bord</h1>
+
+    <% 
+      const startsWithVowel = /^[aeiouyAEIOUY]/.test(user.username);
+      const prefix = startsWithVowel ? "qu’" : "que";
+    %>
+
+    <p class="info">Connecté en tant <%= prefix %><strong><%= user.username %></strong></p>
+
+    <div class="link-box">
+      <% if (!user.discord) { %>
+        <a href="<%= baseUrl %>/api/Oauth2/discord/register/getUrl">🔗 Lier mon compte à Discord</a>
+      <% } else { %>
+        <p class="linked">✅ Compte Discord déjà lié</p>
+      <% } %>
+
+      <% if (!user.github) { %>
+        <a href="<%= baseUrl %>/api/Oauth2/github/register/getUrl">🔗 Lier mon compte à GitHub</a>
+      <% } else { %>
+        <p class="linked">✅ Compte GitHub déjà lié</p>
+      <% } %>
+    </div>
+  </div>
+</body>
+</html>

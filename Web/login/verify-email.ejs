@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Vérification de l'email</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #f0f0f0;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 5vh auto;
+            background-color: #1e1e1e;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
+        }
+
+        h1 {
+            color: #ff9800;
+            margin-bottom: 1rem;
+        }
+
+        p {
+            line-height: 1.5;
+        }
+
+        .highlight {
+            color: #4cafef;
+            font-weight: bold;
+        }
+
+        .time {
+            font-size: 0.9rem;
+            color: #bbb;
+        }
+
+        .spam-warning {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: #2a2a2a;
+            border-left: 4px solid #ff9800;
+            font-size: 0.95rem;
+        }
+
+        form {
+            margin-top: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-top: 1rem;
+            margin-bottom: 0.3rem;
+            font-weight: bold;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            background-color: #2a2a2a;
+            color: #f0f0f0;
+            letter-spacing: 1px;
+        }
+
+        input[type="text"]::placeholder {
+            color: #888;
+        }
+
+        small {
+            display: block;
+            margin-top: 0.3rem;
+            font-size: 0.85rem;
+        }
+
+        button,
+        a.button {
+            display: inline-block;
+            margin-top: 1.5rem;
+            padding: 0.75rem 1.5rem;
+            background-color: #4cafef;
+            color: #121212;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        button:hover,
+        a.button:hover {
+            background-color: #3a9bdc;
+        }
+
+        a.button.secondary {
+            background-color: #ff9800;
+        }
+
+        a.button.secondary:hover {
+            background-color: #e68900;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Vérification requise</h1>
+        <p>Un code de vérification a été envoyé à :</p>
+        <p class="highlight">
+            <%= email %>
+        </p>
+        <p class="time">Envoyé il y a <%= timeCode %>minutes - Valide 30minutes</p>
+
+        <div class="spam-warning">
+            📩 Si vous ne recevez rien dans quelques minutes, pensez à vérifier votre dossier <strong>Spam / Courrier
+                indésirable</strong>.
+        </div>
+
+        <div id="verifyContainer">
+            <input type="hidden" id="email" value="<%= email %>">
+
+            <label for="username">Choisissez un pseudo :</label>
+            <input type="text" id="username" placeholder="Votre pseudo" required>
+            <small id="usernameStatus"></small>
+
+            <label for="code">Code de vérification :</label>
+            <input type="text" id="code" placeholder="Entrez votre code à 12 chiffres" maxlength="12" required>
+
+            <button id="verifyBtn">Valider</button>
+        </div>
+
+
+        <button type="button" id="resendBtn" class="button secondary">Renvoyer le code</button>
+
+    </div>
+
+    <script>
+        document.getElementById('username').addEventListener('blur', async function () {
+            let username = document.getElementById('username').value;
+            username = username.trim().replace(/[^a-zA-Z0-9-]/g, '');
+
+            const statusEl = document.getElementById('usernameStatus');
+
+            if (!username) {
+                statusEl.textContent = "";
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/auth/check-username`, {
+                    method: "POST",
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: username })
+                });
+                const data = await res.json();
+
+                console.log(data)
+
+                if (data.exists == true) {
+                    statusEl.textContent = "❌ Ce pseudo est déjà pris";
+                    statusEl.style.color = "red";
+                } else if (data.exists == false) {
+                    statusEl.textContent = "✅ Ce pseudo est disponible";
+                    statusEl.style.color = "lightgreen";
+                } else if (data.message) {
+                    statusEl.textContent = "❌ " + data.message;
+                    statusEl.style.color = "red";
+                } else {
+                    statusEl.textContent = "⚠️ Erreur lors de la vérification";
+                    statusEl.style.color = "orange";
+                }
+            } catch (err) {
+                statusEl.textContent = "⚠️ Erreur lors de la vérification";
+                statusEl.style.color = "orange";
+            }
+        });
+    </script>
+    <script>
+        document.getElementById('resendBtn').addEventListener('click', async () => {
+            try {
+                const res = await fetch('/api/auth/resend-code', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: "<%= email %>" })
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    alert("✅ Code renvoyé avec succès !");
+                } else {
+                    alert("❌ Erreur : " + (data.message ?? "Impossible de renvoyer le code (maximum un envois par minute!)"));
+                }
+            } catch (err) {
+                alert("⚠️ Erreur réseau", err);
+                console.log(err)
+            }
+        });
+    </script>
+    <script>
+        document.getElementById('verifyBtn').addEventListener('click', async () => {
+            const email = document.getElementById('email').value.trim();
+            const username = document.getElementById('username').value.trim();
+            const code = document.getElementById('code').value.trim();
+
+            if (!username || !code) {
+                alert("Veuillez remplir tous les champs");
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/auth/verify-email', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, username, code })
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    window.location.href = data.redirect;
+                } else {
+                    alert("❌ Erreur : " + (data.message || "Vérification échouée"));
+                }
+            } catch (err) {
+                console.error(err);
+                alert("⚠️ Erreur réseau");
+            }
+        });
+    </script>
+</body>
+
+</html>
