@@ -59,26 +59,28 @@ async function sendCode(email, transporter, code, req) {
         subject: 'Votre code de vérification',
         text: `Bonjour,\n\nVoici votre code de vérification : ${code}\n\nUtilisez-le ici : ${req.protocol}://${req.get('host')}/verify-email\n\nSi vous n'avez pas demandé ce code, ignorez simplement cet email.`,
         html: `
-    <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
-      <h2 style="color: #2c3e50;">Vérification de votre adresse email</h2>
-      <p>Bonjour,</p>
-      <p>Voici votre code de vérification :</p>
-      <p style="font-size: 20px; font-weight: bold; color: #2c3e50; background: #f4f4f4; padding: 10px; display: inline-block; border-radius: 5px;">
-        ${code}
-      </p>
-      <p>Vous pouvez également cliquer sur le bouton ci-dessous pour finaliser la vérification :</p>
-      <p>
-        <a href="${req.protocol}://${req.get('host')}/verify-email" 
-           style="background: #ffae00ff; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px;">
-          Vérifier mon email
-        </a>
-      </p>
-      <p style="font-size: 11px; color: #999 ;margin-top: 10px;">
-        Si vous n'avez pas demandé ce code, ignorez simplement cet email.
-      </p>
-    </div>
-  `
+            <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
+            <h2 style="color: #2c3e50;">Vérification de votre adresse email</h2>
+            <p>Bonjour,</p>
+            <p>Voici votre code de vérification :</p>
+            <p style="font-size: 20px; font-weight: bold; color: #2c3e50; background: #f4f4f4; padding: 10px; display: inline-block; border-radius: 5px;">
+                ${code}
+            </p>
+            <p>Vous pouvez également cliquer sur le bouton ci-dessous pour finaliser la vérification :</p>
+            <p>
+                <a href="${req.protocol}://${req.get('host')}/verify-email" 
+                style="background: #ffae00ff; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px;">
+                Vérifier mon email
+                </a>
+            </p>
+            <p style="font-size: 11px; color: #999 ;margin-top: 10px;">
+                Si vous n'avez pas demandé ce code, ignorez simplement cet email.
+            </p>
+            </div>
+        `
     });
+
+    console.log('[EMAIL-SEND] Verify Code send !'.america)
 }
 
 // 🚀 REGISTER
@@ -91,6 +93,8 @@ router.post("/register", sendEmail, async (req, res) => {
         }
 
         email = email.replace(/\+.*(?=@)/, '').trim()
+        const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+        if (!regex.test(email)) return res.status(400).json({ error: 'Email invalide!' })
 
         if (isBlacklisted(email)) {
             console.log('[USER] - Attempt to registred a blocked email:'.red, email);
@@ -288,6 +292,98 @@ router.post('/check-username', async (req, res) => {
     }
 })
 
+router.post('/update-password', async (req, res) => {
+    try {
+        let { email, code, password } = req.body;
+        if (!email && !code && !password) {
+            return res.status(400).json({ error: "Email, code and username are required." });
+        }
 
+        email = email.replace(/\+.*(?=@)/, '').trim()
+
+        const existingUser = await getUserByEmail(email);
+        if (!existingUser) return res.status(400).json({ error: "Email not registered!" });
+
+        let donneeLogin = await new Promise((resolve, reject) => {
+            db.get("SELECT * FROM password WHERE email = ?", [email], (err, user) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(user);
+                }
+            });
+        });
+
+        const codeDB = donneeLogin.codeEmail
+        const time = (((new Date() - Number(donneeLogin.timeCodeEmail)) / 1000) / 60)
+
+        if (time > 30) return res.status(400).json({ success: false, message: "Code trop ancien." })
+        if (!codeDB == code) {
+            db.run("UPDATE password SET tryCodeEmail = tryCodeEmail + 1 WHERE id = ?", [req.user.id])
+            return res.status(400).json({ success: false, message: "Code invalide." })
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        await db.run("UPDATE password SET password = ?, codeEmail = ?, timeCodeEmail = ? WHERE email = ? AND codeEmail = ?", [hashedPassword, 0, 0, email, code]);
+
+        return res.status(202).json({ success: true, redirect: `${req.protocol}://${req.get('host')}/dashboard` })
+    } catch (err) {
+        console.error("[USER] - Login Error".red, err);
+        return res.status(500).json({ error: "Server error. Please try again later." });
+    }
+})
+
+router.post("/sendResetPasswordCode", sendEmail, async (req, res) => {
+    const email = req.body.email;
+    if (!email) return
+    const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: parseInt(process.env.SMTP_PORT, 10),
+        secure: process.env.SMTP_SECURE === 'true',
+        auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS
+        }
+    });
+
+    function randomCode() {
+        const buf = crypto.randomBytes(6);
+        const num = BigInt('0x' + buf.toString('hex'))
+            % 1_000_000_000_000n;
+        return num.toString().padStart(12, '0');
+    }
+    const code = randomCode()
+
+    db.run("UPDATE password SET codeEmail = ?, timeCodeEmail = ? WHERE email = ?", [code, new Date(), email]);
+
+    transporter.sendMail({
+        from: `"${process.env.APP_NAME}" <${process.env.SMTP_USER}>`,
+        to: email,
+        subject: 'Réinitialisation de votre mot de passe',
+        text: `Bonjour,\n\nVoici votre code de réinitialisation de votre mot de passe : ${code}\n\nUtilisez-le ici : ${req.protocol}://${req.get('host')}/update-password\n\nSi vous n'avez pas demandé ce code, ignorer cet email.`,
+        html: `<div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
+      <h2 style="color: #2c3e50;">Réinitialisation de votre mot de passe</h2>
+      <p>Bonjour,</p>
+      <p>Voici votre code de réinitialisation de votre mot de passe :</p>
+      <p style="font-size: 20px; font-weight: bold; color: #2c3e50; background: #f4f4f4; padding: 10px; display: inline-block; border-radius: 5px;">
+        ${code}
+      </p>
+      <p>Vous pouvez également cliquer sur le bouton ci-dessous pour finaliser la réinitialisation de votre mot de passe :</p>
+      <p>
+        <a href="${req.protocol}://${req.get('host')}/update-password" 
+           style="background: #ffae00ff; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px;">
+          Accèder a la page de validation
+        </a>
+      </p>
+      <p style="font-size: 14px; font-weight: bold; color: #ff0000ff ;margin-top: 10px;">
+        Si vous n'avez pas demandé ce code, ignorez cet email.
+      </p>
+    </div>`
+    });
+    console.log('[EMAIL-SEND] RESET MDP send !'.america)
+
+    res.json({ success: true, message: "Code envoyer!" })
+})
 
 module.exports = router;
