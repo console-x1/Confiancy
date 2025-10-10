@@ -10,7 +10,7 @@ const verifyToken = require('../middleware/authMiddleware');
 console.log('[INIT] - Start Oauth2.js'.blue)
 
 async function getUserBy(email, type) {
-    return new Promise((resolve, reject) => {
+    return await new Promise((resolve, reject) => {
         db.get(`SELECT * FROM password WHERE ${type} = ?`, [email], (err, user) => {
             if (err) {
                 reject(err);
@@ -254,13 +254,12 @@ router.get("/github", async (req, res) => {
 
         const decoded = jwt.verify(req.query.state, process.env.STATE2_SECRET);
 
-        const user = getUserBy(email, "githubEmail")
-        const userById = getUserBy(githubId, "githubId")
-        const userId = decoded.userId
+        const user = await getUserBy(email, "githubEmail")
+        const userById = await getUserBy(githubId, "githubId")
 
         if (decoded.action === 'login') {
 
-            if (user && (user == userById) && (user.id == userId)) {
+            if (user && (user.id == userById.id)) {
 
                 const token = jwt.sign({ id: user.id, email: user.email }, process.env.SECRET_KEY, { expiresIn: "6h" });
 
@@ -273,6 +272,7 @@ router.get("/github", async (req, res) => {
                 res.redirect(`${req.protocol}://${req.get('host')}/dashboard`);
 
             } else {
+                console.log(user, userById)
 
                 return res.status(401).redirect(`${req.protocol}://${req.get('host')}/login`)
 
