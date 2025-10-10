@@ -10,13 +10,13 @@ const verifyToken = (req, res, next) => {
 
     if (!token) {
         console.log('[SAFE] - authMiddleware redirect - NO TOKEN'.yellow)
-        return res.redirect("../login");
+        return res.redirect(`${req.protocol}://${req.get('host')}/login`);
     }
 
     jwt.verify(token, process.env.SECRET_KEY, async (err, decoded) => {
         if (err) {
             console.log('[SAFE] - authMiddleware redirect - BAD TOKEN'.yellow)
-            return res.redirect("../login");
+            return res.redirect(`${req.protocol}://${req.get('host')}/login`);
         }
 
         req.user.id = decoded && decoded.id ? decoded.id : null;
