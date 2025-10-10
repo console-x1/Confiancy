@@ -86,9 +86,16 @@ router.get("/discord/register", async (req, res) => {
             return res.status(400).redirect(`${req.protocol}://${req.get('host')}/login`);
         }
 
+        const alreadyLinked = await new Promise((resolve, reject) => { db.get(`SELECT id FROM password WHERE discordId = ?`, [userData.id], (err, id) => { if (err) reject(err); else resolve(id) }); })
         const conflict0 = await new Promise((resolve, reject) => { db.get(`SELECT id FROM password WHERE email = ? AND id != ?`, [discordEmail, userId], (err, id) => { if (err) reject(err); else resolve(id) }); });
         const conflictDiscord = await new Promise((resolve, reject) => { db.get(`SELECT id FROM password WHERE email = ? AND id != ?`, [discordEmail, userId], (err, id) => { if (err) reject(err); else resolve(id) }); });
         const conflictGitHub = await new Promise((resolve, reject) => { db.get(`SELECT id FROM password WHERE email = ? AND id != ?`, [discordEmail, userId], (err, id) => { if (err) reject(err); else resolve(id) }); });
+        if (alreadyLinked) {
+            return res
+                .status(409)
+                .json({ error: "Ce compte Discord est déjà lié." });
+        }
+
         if (conflict0 || conflictDiscord || conflictGitHub) {
             return res
                 .status(409)
@@ -96,6 +103,7 @@ router.get("/discord/register", async (req, res) => {
         }
 
         await db.run(`UPDATE password SET discordEmail = ?, discordId = ? WHERE id = ?`, [discordEmail, userData.id, userId]);
+        await db.run(`UPDATE badges SET verify = verify + 1 WHERE userId = ?`, [userId]);
 
         console.log(`[OAUTH2] - Discord Account link for user: ${userId}`.green)
 
@@ -218,7 +226,7 @@ router.get("/github", async (req, res) => {
                 client_id: req.get('host').includes("localhost") ? process.env.GITHUB_CLIENT : process.env.GITHUB_CLIENTprod,
                 client_secret: req.get("host").includes("localhost") ? process.env.GITHUB_SECRET : process.env.GITHUB_SECRETprod,
                 code,
-                redirect_uri: `${req.protocol}://${req.get('host')}/api/Oauth2/github`,  // Retirer encodeURIComponent ici
+                redirect_uri: `${req.protocol}://${req.get('host')}/api/Oauth2/github`,
                 state
             })
         });
@@ -279,10 +287,17 @@ router.get("/github", async (req, res) => {
             }
 
         } else if (decoded.action === "register") {
-
+            const alreadyLinked = await new Promise((resolve, reject) => { db.get(`SELECT id FROM password WHERE githubId = ?`, [userData.id], (err, id) => { if (err) reject(err); else resolve(id) }); })
             const conflict0 = await new Promise((resolve, reject) => { db.get(`SELECT id FROM password WHERE email = ? AND id != ?`, [email, userId], (err, id) => { if (err) reject(err); else resolve(id) }); });
             const conflictDiscord = await new Promise((resolve, reject) => { db.get(`SELECT id FROM password WHERE email = ? AND id != ?`, [email, userId], (err, id) => { if (err) reject(err); else resolve(id) }); });
             const conflictGitHub = await new Promise((resolve, reject) => { db.get(`SELECT id FROM password WHERE email = ? AND id != ?`, [email, userId], (err, id) => { if (err) reject(err); else resolve(id) }); });
+            
+            if (alreadyLinked) {
+                return res
+                    .status(409)
+                    .json({ error: "Ce compte GitHub est déjà lié." });
+            }
+
             if (conflict0 || conflictDiscord || conflictGitHub) {
                 return res
                     .status(409)
@@ -290,6 +305,7 @@ router.get("/github", async (req, res) => {
             }
 
             await db.run(`UPDATE password SET githubEmail = ?, githubId = ? WHERE id = ?`, [email, userData.id, userId]);
+            await db.run(`UPDATE badges SET verify = verify + 1 WHERE userId = ?`, [userId]);
 
             console.log(`[OAUTH2] - GitHub Account link for user: ${userId}`.green)
             return res.status(201).redirect(`${req.protocol}://${req.get('host')}/dashboard`)
