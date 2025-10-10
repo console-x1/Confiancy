@@ -7,6 +7,8 @@ require('dotenv').config();
 const port = process.env.PORT
 const path = require('path');
 const cookieParser = require('cookie-parser')
+const cron = require('node-cron');
+const { purgeExpired } = require('./Web/config/blacklist');
 
 app.listen(port, () => {
     console.log(`Serveur démarré sur le port ${port}`.green);
@@ -18,6 +20,10 @@ const limiter = rateLimit({
     message: { error: "Trop de requêtes. Réessaie plus tard." },
     standardHeaders: true,
     legacyHeaders: true,
+});
+
+cron.schedule('0 0 * * *', () => {
+    purgeExpired();
 });
 
 app.use(express.json());

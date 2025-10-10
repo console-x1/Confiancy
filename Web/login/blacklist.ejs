@@ -84,17 +84,10 @@
             <h1>👮‍♂️ Gestion de la Blacklist</h1>
             <% const startsWithVowel=/^[aeiouyAEIOUY]/.test(user.username); const prefix=startsWithVowel ? "qu’" : "que "; %>
                 <p>Connecté en tant <%= prefix %><strong><%= user.username %></strong></p>
-                <h2>📛 Emails bannis :</h2>
-                <ul>
-                    <% bannedEmails.forEach(email=> { %>
-                        <li>
-                            <%= email %>
-                        </li>
-                        <% }) %>
-                </ul>
 
                 <form id="blacklistForm">
                     <input type="email" name="email" id="emailInput" placeholder="Email à bannir" required>
+                    <input type="text" name="reason" id="reasonInput" placeholder="Raison du bannissement" required>
                     <button type="submit">Ajouter à la blacklist</button>
                 </form>
 
@@ -109,14 +102,14 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'include',
-                    body: JSON.stringify({ email })
+                    body: JSON.stringify({ email, reason })
                 });
 
                 const data = await res.json();
                 const status = document.getElementById('statusMessage');
 
                 if (data.success) {
-                    status.textContent = "✅ Email ajouté à la blacklist. (refresh pour le voir)";
+                    status.textContent = "✅ Email ajouté à la blacklist.";
                     status.style.color = "#00ff99";
                 } else {
                     status.textContent = "❌ Erreur : " + (data.error || "Impossible d'ajouter l'email.");

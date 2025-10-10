@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const verifyToken = require('../middleware/authMiddleware');
-const { addToBlacklist, readBlacklist } = require('../config/blacklist');
+const { addToBlacklist } = require('../config/blacklist');
 const path = require('path')
 const fs = require('fs')
 
@@ -16,14 +16,7 @@ const isAdmin = (req, res, next) => {
 };
 
 router.get('/blacklist/manage', verifyToken, isAdmin, (req, res) => {
-    const bannedEmails = readBlacklist();
-    res.render(path.join(__dirname, "../login/blacklist"), { bannedEmails, user: req.user, url: `${req.protocol}://${req.get('host')}/admin/blacklist` });
-});
-
-
-router.get('/blacklist', verifyToken, isAdmin, (req, res) => {
-    const bannedEmails = readBlacklist();
-    res.json({ bannedEmails });
+    res.render(path.join(__dirname, "../login/blacklist"), { user: req.user, url: `${req.protocol}://${req.get('host')}/admin/blacklist` });
 });
 
 router.post('/blacklist', verifyToken, isAdmin, (req, res) => {
