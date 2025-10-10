@@ -34,6 +34,7 @@ db.serialize(() => {
     db.run(`
         CREATE TABLE IF NOT EXISTS users (
         userId INTEGER NOT NULL PRIMARY KEY,
+        avatar TEXT,
         
         fiabilityScore INTEGER NOT NULL DEFAULT 50,
         fiabilityCount INTEGER DEFAULT 0 CHECK(fiabilityCount >= 0),
@@ -47,8 +48,8 @@ db.serialize(() => {
         teamScore INTEGER NOT NULL DEFAULT 50,
         teamCount INTEGER DEFAULT 0 CHECK(teamCount >= 0),
 
-        honnestyScore INTEGER NOT NULL DEFAULT 50,
-        honnestyCount INTEGER DEFAULT 0 CHECK(honnestyCount >= 0),
+        honestyScore INTEGER NOT NULL DEFAULT 50,
+        honestyCount INTEGER DEFAULT 0 CHECK(honnestyCount >= 0),
 
         timeScore INTEGER NOT NULL DEFAULT 50,
         timeCount INTEGER DEFAULT 0 CHECK(timeCount >= 0),
@@ -76,6 +77,7 @@ db.serialize(() => {
         categorie TEXT NOT NULL,
         
         avis TEXT NOT NULL,
+        note INTEGER NOT NULL,
         PRIMARY KEY (authorId, targetId, categorie)
     )`), (err) => {
         if (err) console.log('[DB] '.red, err.message)
