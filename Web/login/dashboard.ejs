@@ -64,10 +64,15 @@
 
     <% 
       const startsWithVowel = /^[aeiouyAEIOUY]/.test(user.username);
-      const prefix = startsWithVowel ? "qu’" : "que";
+      const prefix = startsWithVowel ? "qu’" : "que ";
     %>
 
     <p class="info">Connecté en tant <%= prefix %><strong><%= user.username %></strong></p>
+
+    <button onclick="window.location.href='<%= baseUrl %>/dashboard/logout'" style="margin-bottom: 20px; padding: 10px 15px; background-color: #ff1900; color: white; border: none; border-radius: 5px; cursor: pointer;">🔒 Se déconnecter</button>
+    <button onclick="window.location.href='<%= baseUrl %>/dashboard/delete-account'" style="margin-bottom: 20px; padding: 10px 15px; background-color: #ff1900; color: white; border: none; border-radius: 5px; cursor: pointer;">🗑️ Supprimer mon compte</button>
+    <button onclick="window.location.href='<%= baseUrl %>/dashboard/avis'" style="margin-bottom: 20px; padding: 10px 15px; background-color: #2980b9; color: white; border: none; border-radius: 5px; cursor: pointer;">⭐ Voir tous mes avis</button>
+    <button onclick="window.location.href='<%= baseUrl %>/user/<%= user.id %>'" style="margin-bottom: 20px; padding: 10px 15px; background-color: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer;">📚 Voir ma page publique</button>
 
     <div class="link-box">
       <% if (!user.discord) { %>

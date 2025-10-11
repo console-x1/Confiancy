@@ -384,7 +384,97 @@ router.post("/sendResetPasswordCode", sendEmail, async (req, res) => {
     });
     console.log('[EMAIL-SEND] RESET MDP send !'.america)
 
-    res.json({ success: true, message: "Code envoyer!" })
+    res.json({ success: true, message: "Code envoyé !" })
+})
+
+router.post("/delete-account", verifyToken, async (req, res) => {
+    try {
+        const { email, id, username, code } = req.body;
+        if (!email || !id || !username || !code) {
+            return res.status(400).json({ error: "Email, id, username, and password are required." });
+        }
+
+        // Check if the user exists
+        const user = await new Promise((resolve, reject) => {
+            db.get("SELECT * FROM users WHERE userId = ? AND username = ?", [id, username], (err, user) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(user);
+                }
+            });
+        });
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found." });
+        }
+
+        if (req.user.id !== user.userId) {
+            return res.status(403).json({ error: "You can only delete your own account." });
+        }
+
+        const passwd = await new Promise((resolve, reject) => {
+            db.get("SELECT * FROM password WHERE id = ? AND email = ?", [id, email], (err, user) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(user);
+                }
+            });
+        });
+
+        if (!passwd || !passwd.password) {
+            return res.status(404).json({ error: "Password not found." });
+        }
+
+        const validPassword = await bcrypt.compare(code, passwd.password);
+        if (!validPassword) {
+            return res.status(401).json({ error: "Invalid password." });
+        }
+
+        await new Promise((resolve, reject) => {
+            db.run("DELETE FROM users WHERE userId = ?", [id], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve();
+                }
+            });
+        });
+        await new Promise((resolve, reject) => {
+            db.run("DELETE FROM password WHERE id = ?", [id], (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve();
+                }
+            });
+        });
+
+        await new Promise((resolve, rejects) => {
+            db.run("DELETE FROM avis WHERE authorId = ? OR targetId = ?", [id, id], (err) => {
+                if (err) {
+                    rejects(err);
+                } else {
+                    resolve();
+                }
+            });
+        });
+        await new Promise((resolve, rejects) => {
+            db.run("DELETE FROM badges WHERE userId = ?", [id], (err) => {
+                if (err) {
+                    rejects(err);
+                } else {
+                    resolve();
+                }
+            });
+        });
+
+        res.status(200).json({ success: true, message: "Account deleted successfully." });
+    } catch (err) {
+        console.error("[USER] - Delete Account Error".red, err);
+        res.status(500).json({ error: "Server error. Please try again later." });
+    }
 })
 
 module.exports = router;

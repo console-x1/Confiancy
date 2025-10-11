@@ -196,11 +196,10 @@
 
                 const data = await res.json();
 
-                if (data.success) {
-                    alert("✅ Code renvoyé avec succès !");
-                } else {
-                    alert("❌ Erreur : " + (data.message ?? "Impossible de renvoyer le code (maximum un envois par minute!)"));
-                }
+                if (!data.success) alert("❌ Erreur : " + (data.message ?? "Impossible de renvoyer le code (maximum un envois par minute!)"));
+
+                console.log(data.message)
+                window.location.reload()
             } catch (err) {
                 alert("⚠️ Erreur réseau", err);
                 console.log(err)

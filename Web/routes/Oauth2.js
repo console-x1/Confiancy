@@ -264,6 +264,7 @@ router.get("/github", async (req, res) => {
 
         const user = await getUserBy(email, "githubEmail")
         const userById = await getUserBy(githubId, "githubId")
+        const userId = decoded.userId
 
         if (decoded.action === 'login') {
 

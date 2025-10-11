@@ -34,13 +34,33 @@ router.get("/user/:id", async (req, res) => {
         return res.status(404).json({ error: "Utilisateur non trouvé" });
     }
 
-    db.all("SELECT a.authorId,a.targetId,a.avis,a.note,a.date,u.username as reviewer FROM avis a LEFT JOIN users u ON a.authorId = u.userId WHERE a.targetId = ?", [userId], async (err, rows) => {
+    db.all(`
+        SELECT a.authorId, a.targetId, a.avis, a.note, a.date, 
+           u.username AS reviewer,
+           b.verify
+        FROM avis a
+        LEFT JOIN users u ON a.authorId = u.userId
+        LEFT JOIN badges b ON a.authorId = b.userId
+        WHERE a.targetId = ?
+        AND b.verify > 1
+        ORDER BY a.date DESC
+        LIMIT 10
+    `, [userId],
+    async (err, rows) => {
         let grouped = [];
+
         if (!err && rows) {
-            rows.forEach(r => {
-                try { r.avis = JSON.parse(r.avis); } catch (e) { }
-                if (!grouped) grouped = [];
-                grouped.push({ reviewer: r.reviewer || r.authorId, reviewerId: r.authorId, note: r.note, comment: r.avis, date: r.date });
+            grouped = rows.map(r => {
+                let avis;
+                try { avis = JSON.parse(r.avis); } catch { avis = r.avis; }
+                return {
+                    reviewer: r.reviewer || r.authorId,
+                    reviewerId: r.authorId,
+                    note: r.note,
+                    comment: avis,
+                    date: r.date,
+                    verify: r.verify || 0
+                };
             });
         }
 
@@ -53,18 +73,49 @@ router.get("/user/:id", async (req, res) => {
             } catch (e) { }
         }
 
-        const alreadyReviewed = new Promise((resolve, reject) => {
-            db.get(`SELECT * FROM avis WHERE targetId = ? AND authorId = ?`, [userId, viewerId], (err, row) => {
-                if (err) { 
-                    reject(err)
-                }
-                else {
-                    resolve(row)
-                }
+        let viewerReview = null;
+        if (viewerId) {
+            viewerReview = await new Promise((resolve, reject) => {
+                db.get(
+                    `SELECT a.authorId, a.targetId, a.avis, a.note, a.date, u.username AS reviewer
+                 FROM avis a
+                 LEFT JOIN users u ON a.authorId = u.userId
+                 WHERE a.targetId = ? AND a.authorId = ?`,
+                    [userId, viewerId],
+                    (err, row) => {
+                        if (err) reject(err);
+                        else resolve(row);
+                    }
+                );
             });
-        });
 
-        return res.render(path.join(__dirname, "../login/profile"), { user, reviewsGrouped: grouped, viewerId, alreadyReviewed: await alreadyReviewed, Score: user.Score || 50, Count: user.Count || 0 });
+            if (viewerReview && !grouped.find(r => r.reviewerId === viewerReview.authorId)) {
+                let avis;
+                try { avis = JSON.parse(viewerReview.avis); } catch { avis = viewerReview.avis; }
+
+                grouped.push({
+                    reviewer: viewerReview.reviewer || viewerReview.authorId,
+                    reviewerId: viewerReview.authorId,
+                    note: viewerReview.note,
+                    comment: avis,
+                    date: viewerReview.date
+                });
+            }
+        }
+
+        if (grouped.length > 11) grouped = grouped.slice(0, 11);
+
+        return res.render(
+            path.join(__dirname, "../login/profile"),
+            {
+                user,
+                reviewsGrouped: grouped,
+                viewerId,
+                alreadyReviewed: viewerReview || undefined,
+                Score: user.Score || 50,
+                Count: user.Count || 0
+            }
+        );
     });
 });
 

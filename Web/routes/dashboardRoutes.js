@@ -19,6 +19,50 @@ router.get("/verify-email", verifyToken, async (req, res) => {
     res.render(path.join(__dirname, "../login/verify-email"), { email: req.user.email, timeCode: (((new Date() - Number(req.user.timeCodeEmail)) / 1000) / 60).toFixed(0) })
 })
 
+router.get("/delete-account", verifyToken, async (req, res) => {
+    res.render(path.join(__dirname, "../login/delete-account"), { email: req.user.email, id: req.user.id });
+})
+
+router.get("/avis", verifyToken, async (req, res) => {
+    db.all(`
+        SELECT a.authorId, a.targetId, a.avis, a.note, a.date, 
+           u.username AS reviewer
+        FROM avis a
+        LEFT JOIN users u ON a.authorId = u.userId
+        WHERE a.targetId = ?
+        ORDER BY a.date DESC
+    `, [req.user.id],
+        async (err, rows) => {
+            let grouped = [];
+
+            if (!err && rows) {
+                grouped = rows.map(r => {
+                    let avis;
+                    try { avis = JSON.parse(r.avis); } catch { avis = r.avis; }
+                    return {
+                        reviewer: r.reviewer || r.authorId,
+                        reviewerId: r.authorId,
+                        reviewerPage: `${req.protocol}://${req.get('host')}/user/${r.authorId}`,
+                        note: r.note + '/10',
+                        comment: avis,
+                        date: new Date(r.date).toLocaleDateString('fr-FR', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        })
+                    };
+                });
+            }
+
+            res.json({ reviews: grouped })
+        });
+});
+
+router.get("/logout", (req, res) => {
+    res.clearCookie("auth_token", { path: '/', httpOnly: true, secure: false, sameSite: 'Lax' });
+    res.redirect('/');
+});
+
 router.get("/update-password", async (req, res) => {
     let email = req.query.email
     if (!email) return res.status(400).json({ error: "Email requise pour cette opération!" })
@@ -37,7 +81,7 @@ router.get("/update-password", async (req, res) => {
             }
         });
     });
-    if (!user) return res.status(401).json({ error: "Aucun compte ne possede cette email !"})
+    if (!user) return res.status(401).json({ error: "Aucun compte ne possede cette email !" })
 
     const existing = await new Promise((resolve, reject) => {
         db.get("SELECT * FROM password WHERE email = ? AND timeCodeEmail != 0", [email], (err, user) => {

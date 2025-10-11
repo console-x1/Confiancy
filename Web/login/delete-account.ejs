@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Delete account</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #f0f0f0;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 5vh auto;
+            background-color: #1e1e1e;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
+        }
+
+        h1 {
+            color: #ff9800;
+            margin-bottom: 1rem;
+        }
+
+        p {
+            line-height: 1.5;
+        }
+
+        .highlight {
+            color: #4cafef;
+            font-weight: bold;
+        }
+
+        .time {
+            font-size: 0.9rem;
+            color: #bbb;
+        }
+
+        .warning {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: #2a2a2a;
+            border-left: 4px solid #ff9800;
+            font-size: 0.95rem;
+        }
+
+        form {
+            margin-top: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-top: 1rem;
+            margin-bottom: 0.3rem;
+            font-weight: bold;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            background-color: #2a2a2a;
+            color: #f0f0f0;
+            letter-spacing: 1px;
+        }
+
+        input[type="text"]::placeholder {
+            color: #888;
+        }
+
+        small {
+            display: block;
+            margin-top: 0.3rem;
+            font-size: 0.85rem;
+        }
+
+        button,
+        a.button {
+            display: inline-block;
+            margin-top: 1.5rem;
+            padding: 0.75rem 1.5rem;
+            background-color: #4cafef;
+            color: #121212;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        button:hover,
+        a.button:hover {
+            background-color: #3a9bdc;
+        }
+
+        a.button.secondary {
+            background-color: #ff9800;
+        }
+
+        a.button.secondary:hover {
+            background-color: #e68900;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Suppression de compte</h1>
+        <p>Êtes-vous sûr de vouloir supprimer votre compte ?</p>
+
+        <div class="warning">
+            <strong>Cette action est irréversible.</strong> Toutes vos données seront définitivement supprimées. Avis, commentaires, et autres informations associées à votre compte seront perdus.
+        </div>
+
+        <div id="verifyContainer">
+            <input type="hidden" id="email" value="<%= email %>">
+            <input type="hidden" id="id" value="<%= id %>">
+
+            <label for="username">Indiquer votre pseudo pour continuer :</label>
+            <input type="text" id="username" placeholder="Votre pseudo" required>
+            <small id="usernameStatus"></small>
+
+            <label for="code">Mots de passe :</label>
+            <input type="text" id="code" placeholder="Entrez votre mot de passe" minlength="12" required>
+
+            <button id="deleteBtn">Confirmer la suppression</button>
+        </div>
+
+
+        <button onclick="window.location.href='/'" class="button secondary">Annuler</button>
+
+    </div>
+
+    <script>
+        document.getElementById('deleteBtn').addEventListener('click', async () => {
+            const email = document.getElementById('email').value.trim();
+            const id = document.getElementById('id').value.trim();
+            const username = document.getElementById('username').value.trim();
+            const code = document.getElementById('code').value.trim();
+
+            if (!username || !code || !email || !id) {
+                alert("Veuillez remplir tous les champs.");
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/auth/delete-account', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, id, username, code })
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    console.log(data.message)
+                    window.location.reload()
+                } else {
+                    alert("❌ Erreur : " + (data.message || "Suppression échouée. Veuillez réessayer."));
+                }
+            } catch (err) {
+                console.error(err);
+                alert("⚠️ Erreur réseau");
+            }
+        });
+    </script>
+</body>
+
+</html>

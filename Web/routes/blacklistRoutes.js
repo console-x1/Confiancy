@@ -53,7 +53,15 @@ router.post('/blacklist', verifyToken, isAdmin, (req, res) => {
                             `DELETE FROM users WHERE id = ?`,
                             [id]
                         )
-
+                        db.run(
+                            `DELETE FROM avis WHERE authorId = ? OR targetId = ?`,
+                            [id, id]
+                        );
+                        db.run(
+                            `DELETE FROM badges WHERE userId = ?`,
+                            [id]
+                        );
+                        
                     } catch (err) {
                         if (err) console.error(`[BLACKLIST] Suppression échouée pour : ${email} - `.red, err.message);
                         else console.log(`[BLACKLIST]`.red + ` Comptes supprimés pour : ${email}`.yellow);
