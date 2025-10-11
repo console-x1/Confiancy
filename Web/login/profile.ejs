@@ -25,87 +25,45 @@
             </h1>
 
             <div class="score">
-                <% const totalScore = ((Number(user.fiabilityScore)||0) + (Number(user.jobScore)||0) + (Number(user.commuScore)||0) + (Number(user.teamScore)||0) + (Number(user.honestyScore)||0) + (Number(user.timeScore)||0) + (Number(user.activityScore)||0) + (Number(user.qualityScore)||0) + (Number(user.learningScore)||0) + (Number(user.coldnessScore)||0)) / 10; %>
-                <p><strong>Score total :</strong> <%= totalScore %>/100</p>
-                <p><strong>Score de fiabilité :</strong>
-                    <%= user.fiabilityScore %>/100 (<%= user.fiabilityCount %> avis)
-                </p>
-                <p><strong>Score de compétence (dans son domaine) :</strong>
-                    <%= user.jobScore %>/100 (<%= user.jobCount %> avis)
-                </p>
-                <p><strong>Score de communication :</strong>
-                    <%= user.commuScore %>/100 (<%= user.commuCount %> avis)
-                </p>
-                <p><strong>Score de travail d'équipe :</strong>
-                    <%= user.teamScore %>/100 (<%= user.teamCount %> avis)
-                </p>
-                <p><strong>Score d'honnêteté :</strong>
-                    <%= user.honestyScore %>/100 (<%= user.honestyCount %> avis)
-                </p>
-                <p><strong>Score de respect des délais :</strong>
-                    <%= user.timeScore %>/100 (<%= user.timeCount %> avis)
-                </p>
-                <p><strong>Score d'initiative :</strong>
-                    <%= user.activityScore %>/100 (<%= user.activityCount %> avis)
-                </p>
-                <p><strong>Score de qualité :</strong>
-                    <%= user.qualityScore %>/100 (<%= user.qualityCount %> avis)
-                </p>
-                <p><strong>Score d'apprentissage :</strong>
-                    <%= user.learningScore %>/100 (<%= user.learningCount %> avis)
-                </p>
-                <p><strong>Score de sang-froid :</strong>
-                    <%= user.coldnessScore %>/100 (<%= user.coldnessCount %> avis)
-                </p>
+                <p><strong>Score :</strong> <%= Score %>/100 (<%= Count %> avis)</p>
             </div>
 
             <div class="avis">
                 <br>
-                <h2>Avis par catégorie :</h2>
-                <% const categories = [
-                    { key: 'fiability', label: 'Fiabilité' },
-                    { key: 'job', label: 'Compétence' },
-                    { key: 'commu', label: 'Communication' },
-                    { key: 'team', label: 'Travail en équipe' },
-                    { key: 'honesty', label: 'Honnêteté' },
-                    { key: 'time', label: 'Respect des délais' },
-                    { key: 'activity', label: 'Initiative' },
-                    { key: 'quality', label: 'Qualité' },
-                    { key: 'learning', label: 'Apprentissage' },
-                    { key: 'coldness', label: 'Sang-froid' }
-                ]; %>
-                <% categories.forEach(cat => { %>
-                    <section class="category">
-                        <h3><%= cat.label %></h3>
-                        <% const list = reviewsGrouped && reviewsGrouped[cat.key] ? reviewsGrouped[cat.key] : []; %>
-                        <% if (list.length === 0) { %>
-                            <p>Aucun avis pour cette catégorie.</p>
-                        <% } else { %>
-                            <% list.forEach(r => { %>
-                                <div class="review">
-                                    <p><strong>De :</strong> <%= r.reviewer %></p>
-                                    <p><strong>Note :</strong> <%= r.note %>/10</p>
-                                    <p><strong>Commentaire :</strong> <%= r.comment %></p>
-                                </div>
-                            <% }) %>
-                        <% } %>
-                        <br>
-
-                        <% if (viewerId !== null && viewerId !== user.userId) { %>
-                            <% if (alreadyReviewed && alreadyReviewed.includes(cat.key)) { %>
-                                <p>Vous avez déjà laissé un avis pour cette catégorie.</p>
-                            <% } else { %>
-                                <form class="add-review" method="post" action="/api/reviews/<%= user.userId %>">
-                                    <input type="hidden" name="categorie" value="<%= cat.key %>">
-                                    <label>Note (1-10): <input name="note" type="number" min="1" max="10" required></label>
-                                    <label>Commentaire: <input name="comment" type="text" autocomplete="off" required></label>
-                                    <button type="submit">Ajouter un avis</button>
-                                </form>
+                <h2>Avis :</h2>
+                <% const list = reviewsGrouped ? reviewsGrouped : []; %>
+                <% if (list.length === 0) { %>
+                    <p>Aucun avis.</p>
+                <% } else { %>
+                    <% list.forEach(r => { %>
+                        <div class="review">
+                            <p><strong>De :</strong> <a href="/user/<%= r.reviewerId %>"><%= r.reviewer %></a></p>
+                            <p><strong>Note :</strong> <%= r.note %>/10</p>
+                            <% if (r.comment) { %>
+                                <p><strong>Commentaire :</strong> <%= r.comment %></p>
                             <% } %>
-                            <br>
-                        <% } %>
-                    </section>
-                <% }) %>
+                            <p><em>Le <%= new Date(r.date).toLocaleDateString('fr-FR', {
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric'
+                                }) %></em></p>
+                        </div>
+                    <% }) %>
+                <% } %>
+                <br>
+
+                <% if (viewerId !== null && viewerId !== user.userId) { %>
+                    <% if (alreadyReviewed) { %>
+                        <p>Vous avez déjà laissé un avis.</p>
+                    <% } else { %>
+                        <form class="add-review" method="post" action="/api/reviews/<%= user.userId %>">
+                            <label>Note (1-10): <input name="note" type="number" min="1" max="10" required></label>
+                            <label>Commentaire: <input name="comment" type="text" autocomplete="off" minlength="10" maxlength="512"></label>
+                            <button type="submit">Ajouter un avis</button>
+                        </form>
+                    <% } %>
+                    <br>
+                <% } %>
             </div>
         </div>
     </div>

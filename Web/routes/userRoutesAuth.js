@@ -262,6 +262,7 @@ router.post('/verify-email', verifyToken, async (req, res) => {
         }
 
         await db.run("INSERT INTO users (userId, username) VALUES (?, ?)", [req.user.id, username]);
+        await db.run("INSERT INTO badges (userId) VALUES (?)", [req.user.id])
         await db.run("UPDATE password SET codeEmail = ?, timeCodeEmail = ? WHERE email = ? AND id = ?", [0, 0, email, req.user.id]);
 
         return res.status(202).json({ success: true, redirect: `${req.protocol}://${req.get('host')}/dashboard` })

@@ -34,13 +34,13 @@ router.get("/user/:id", async (req, res) => {
         return res.status(404).json({ error: "Utilisateur non trouvé" });
     }
 
-    db.all("SELECT a.authorId,a.targetId,a.categorie,a.avis,a.note,u.username as reviewer FROM avis a LEFT JOIN users u ON a.authorId = u.userId WHERE a.targetId = ?", [userId], async (err, rows) => {
-        let grouped = {};
+    db.all("SELECT a.authorId,a.targetId,a.avis,a.note,a.date,u.username as reviewer FROM avis a LEFT JOIN users u ON a.authorId = u.userId WHERE a.targetId = ?", [userId], async (err, rows) => {
+        let grouped = [];
         if (!err && rows) {
             rows.forEach(r => {
                 try { r.avis = JSON.parse(r.avis); } catch (e) { }
-                if (!grouped[r.categorie]) grouped[r.categorie] = [];
-                grouped[r.categorie].push({ reviewer: r.reviewer || r.authorId, note: r.note, comment: r.avis });
+                if (!grouped) grouped = [];
+                grouped.push({ reviewer: r.reviewer || r.authorId, reviewerId: r.authorId, note: r.note, comment: r.avis, date: r.date });
             });
         }
 
@@ -52,19 +52,19 @@ router.get("/user/:id", async (req, res) => {
                 if (decoded && decoded.id) viewerId = decoded.id;
             } catch (e) { }
         }
-        
-        const categorie = new Promise((resolve, reject) => {
-            db.all(`SELECT categorie FROM avis WHERE targetId = ? AND authorId = ?`, [userId, viewerId], (err, row) => {
+
+        const alreadyReviewed = new Promise((resolve, reject) => {
+            db.get(`SELECT * FROM avis WHERE targetId = ? AND authorId = ?`, [userId, viewerId], (err, row) => {
                 if (err) { 
                     reject(err)
                 }
                 else {
-                    resolve(rows.map(r => r.categorie))
+                    resolve(row)
                 }
             });
         });
 
-        return res.render(path.join(__dirname, "../login/profile"), { user, reviewsGrouped: grouped, viewerId, alreadyReviewed: await categorie });
+        return res.render(path.join(__dirname, "../login/profile"), { user, reviewsGrouped: grouped, viewerId, alreadyReviewed: await alreadyReviewed, Score: user.Score || 50, Count: user.Count || 0 });
     });
 });
 

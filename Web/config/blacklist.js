@@ -794,7 +794,7 @@ function isBlacklisted(email) {
   if (!email) return false;
   email = email.toLowerCase().trim();
 
-  if (disposableDomains.some(domain => email.endsWith(domain))) {
+  if (blacklistDomains.some(domain => email.endsWith(domain))) {
     return true;
   }
 

@@ -36,35 +36,8 @@ db.serialize(() => {
         userId INTEGER NOT NULL PRIMARY KEY,
         avatar TEXT,
         
-        fiabilityScore INTEGER NOT NULL DEFAULT 50,
-        fiabilityCount INTEGER DEFAULT 0 CHECK(fiabilityCount >= 0),
-        
-        jobScore INTEGER NOT NULL DEFAULT 50,
-        jobCount INTEGER DEFAULT 0 CHECK(jobCount >= 0),
-
-        commuScore INTEGER NOT NULL DEFAULT 50,
-        commuCount INTEGER DEFAULT 0 CHECK(commuCount >= 0),
-
-        teamScore INTEGER NOT NULL DEFAULT 50,
-        teamCount INTEGER DEFAULT 0 CHECK(teamCount >= 0),
-
-        honestyScore INTEGER NOT NULL DEFAULT 50,
-        honestyCount INTEGER DEFAULT 0 CHECK(honnestyCount >= 0),
-
-        timeScore INTEGER NOT NULL DEFAULT 50,
-        timeCount INTEGER DEFAULT 0 CHECK(timeCount >= 0),
-
-        activityScore INTEGER NOT NULL DEFAULT 50,
-        activityCount INTEGER DEFAULT 0 CHECK(activityCount >= 0),
-
-        qualityScore INTEGER NOT NULL DEFAULT 50,
-        qualityCount INTEGER DEFAULT 0 CHECK(qualityCount >= 0),
-
-        learningScore INTEGER NOT NULL DEFAULT 50,
-        learningCount INTEGER DEFAULT 0 CHECK(learningCount >= 0),
-
-        coldnessScore INTEGER NOT NULL DEFAULT 50,
-        coldnessCount INTEGER DEFAULT 0 CHECK(coldnessCount >= 0),
+        Score INTEGER NOT NULL DEFAULT 50,
+        Count INTEGER DEFAULT 0 CHECK(Count >= 0),
 
         username TEXT UNIQUE NOT NULL
     )`, (err) => {
@@ -74,30 +47,28 @@ db.serialize(() => {
         CREATE TABLE IF NOT EXISTS avis (
         authorId INTEGER NOT NULL,
         targetId INTEGER NOT NULL,
-        categorie TEXT NOT NULL,
         
-        avis TEXT NOT NULL,
+        avis TEXT,
         note INTEGER NOT NULL,
-        PRIMARY KEY (authorId, targetId, categorie)
-    )`), (err) => {
+        date INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+        PRIMARY KEY (authorId, targetId)
+    )`, (err) => {
         if (err) console.log('[DB] '.red, err.message)
-    };
+    });
     db.run(`
         CREATE TABLE IF NOT EXISTS badges (
-        userId INTERGER NOT NULL PRIMARY KEY,
+        userId INTEGER NOT NULL PRIMARY KEY,
 
-        verify1 BOOLEAN,
-        verify2 BOOLEAN,
-        verifi3 BOOLEAN,
+        verify INTEGER DEFAULT 0,
 
-        premium BOOLEAN,
+        premium BOOLEAN DEFAULT false,
 
-        job BOOLEAN,
+        job BOOLEAN DEFAULT false,
 
-        staff BOOLEAN
-    )`), (err) => {
+        staff BOOLEAN DEFAULT false
+    )`, (err) => {
         if (err) console.log('[DB] '.red, err.message)
-    }
+    });
 });
 
 module.exports = db;

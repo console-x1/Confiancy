@@ -150,6 +150,11 @@ body {
   color: #aaa;
 }
 
+.review a {
+  color: #2196F3;
+  text-decoration: none;
+}
+
 /* Glassmorphism effect */
 .glass-effect {
   position: absolute;
