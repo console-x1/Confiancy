@@ -53,12 +53,17 @@ const verifyToken = (req, res, next) => {
             req.user.github = donneeLogin && donneeLogin.githubId ? true : false
             req.user.discord = donneeLogin && donneeLogin.discordId ? true : false
 
+            function long(str, len) {
+                str = String(str);
+                if (str.length <= len) return str.padEnd(len, ' ');
+                return str.slice(-len);
+            }
 
-            const routeInfo = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
+            const routeInfo = long(`${req.protocol}://${req.get('host')}${req.originalUrl}`, 55);
 
             if (routeInfo.includes('/api/')) return next()
 
-            console.log(req.user.username ? `[SAFE] - Route ${routeInfo} - User ID: ${req.user.id} - Email: ${req.user.email}`.green : `[SAFE] - Route ${routeInfo} - User ID: ${req.user.id} - Email: ${req.user.email}`.yellow)
+            console.log(req.user.username ? `[SAFE] - ${routeInfo} - ${long(req.user.username, 20)} - ${req.user.email}`.green : `[SAFE] - ${routeInfo} - User ID: ${long(req.user.id, 20 - 'User ID: '.length)} - ${req.user.email}`.yellow)
             return next();
 
         } catch (e) {
