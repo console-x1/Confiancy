@@ -20,13 +20,13 @@ router.get('/blacklist/manage', verifyToken, isAdmin, (req, res) => {
 });
 
 router.post('/blacklist', verifyToken, isAdmin, (req, res) => {
-    const { email } = req.body;
+    const { email, reason } = req.body;
 
-    if (!email) {
-        return res.status(400).json({ error: "Email requis" });
+    if (!email || !reason) {
+        return res.status(400).json({ error: "Email et raison requis" });
     }
 
-    if (addToBlacklist(email)) {
+    if (addToBlacklist(email, reason)) {
         console.log(`[BLACKLIST] Email banni: ${email}`.yellow);
         res.json({ success: true, message: "Email ajouté à la blacklist" });
         db.all(
@@ -50,7 +50,7 @@ router.post('/blacklist', verifyToken, isAdmin, (req, res) => {
                             [email],
                         );
                         db.run(
-                            `DELETE FROM users WHERE id = ?`,
+                            `DELETE FROM users WHERE userId = ?`,
                             [id]
                         )
                         db.run(

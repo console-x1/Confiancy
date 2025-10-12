@@ -47,7 +47,7 @@
             flex-direction: column;
         }
 
-        input[type="email"] {
+        input {
             padding: 0.6rem;
             border: none;
             border-radius: 6px;
@@ -98,6 +98,7 @@
             document.getElementById('blacklistForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const email = document.getElementById('emailInput').value.trim();
+                const reason = document.getElementById('reasonInput').value.trim();
                 const res = await fetch('<%= url %>', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -112,7 +113,7 @@
                     status.textContent = "✅ Email ajouté à la blacklist.";
                     status.style.color = "#00ff99";
                 } else {
-                    status.textContent = "❌ Erreur : " + (data.error || "Impossible d'ajouter l'email.");
+                    status.textContent = "❌ " + (data.error || "Impossible d'ajouter l'email à la blacklist.");
                     status.style.color = "#ff6666";
                 }
             });
