@@ -42,7 +42,17 @@ const verifyToken = (req, res, next) => {
                     }
                     resolve(user || null);
                 })
-            })
+            });
+
+            const badges = await new Promise((resolve, reject) => {
+                db.get("SELECT * FROM badges WHERE userId = ?", [decoded.id], (err, rows) => {
+                    if (err) {
+                        console.error("[USER] - Error fetching user badges data".red, err);
+                        return reject(err);
+                    }
+                    resolve(rows || null);
+                });
+            });
 
             if (donneeLogin == null) return res.redirect(`${req.protocol}://${req.get('host')}/login`);
 
@@ -52,6 +62,7 @@ const verifyToken = (req, res, next) => {
             req.user.timeCodeEmail = donneeLogin.timeCodeEmail;
             req.user.github = donneeLogin && donneeLogin.githubId ? true : false
             req.user.discord = donneeLogin && donneeLogin.discordId ? true : false
+            req.user.badges = { staff: badges.staff, verify: badges.verify, job: badges.job, premium: badges.premium }
 
             function long(str, len) {
                 str = String(str);

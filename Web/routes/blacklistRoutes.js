@@ -8,7 +8,7 @@ const fs = require('fs')
 let db = require('../config/database')
 
 const isAdmin = (req, res, next) => {
-    if (req.user && (req.user.badges && req.user.badges[staff])) {
+    if (req.user && (req.user.badges && req.user.badges.staff === 1)) {
         next();
     } else {
         res.status(403).json({ error: "Accès non autorisé" });

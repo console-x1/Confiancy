@@ -79,7 +79,7 @@
 </head>
 
 <body>
-    <% if (user.id==1 || (user.badges && user.badges[staff])) { %>
+    <% if (user.id==1 || (user.badges && user.badges.staff === 1)) { %>
         <div class="container">
             <h1>👮‍♂️ Gestion de la Blacklist</h1>
             <% const startsWithVowel=/^[aeiouyAEIOUY]/.test(user.username); const prefix=startsWithVowel ? "qu’" : "que "; %>
