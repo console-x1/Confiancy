@@ -93,7 +93,7 @@ Confiancy/
 ## À quoi servent les principaux fichiers/dossiers
 - `index.js`: Initialise Express, charge les middlewares (`json`, `cookie-parser`, limiter), sert le statique `Web/public`, configure EJS, déclare les routes et démarre le serveur. Lance aussi une tâche CRON pour purger la blacklist.
 - `Web/public/`: Contenu statique côté client.
-  - `index.html`: page d’accueil; utilise `css/index.css` pour un style cohérent.
+  - `index.html`: page d’accueil.
   - `login.html`, `register.html`: formulaires d’authentification.
   - `css/`: styles spécifiques à chaque page (ex: `login.css`, `register.css`, `profile.css`, `index.css`).
   - `javascript/auth.js`: logique front d’auth (soumission, animations, etc.).
@@ -104,7 +104,7 @@ Confiancy/
   - `userRoutesAuth.js`: API auth (register/login, verify-email, update-password, delete-account). Gère l’emailing de codes, hash des mots de passe, et cookies JWT.
   - `dashboardRoutes.js`: routes protégées du tableau de bord (rendu EJS, avis de l’utilisateur, logout, reset password flow).
   - `Oauth2.js`: intégrations OAuth2 (Discord, GitHub) pour login/liaison de compte.
-  - `blacklistRoutes.js`, `reviewRoutes.js`: administration blacklist et avis (selon besoins).
+  - `blacklistRoutes.js`, `reviewRoutes.js`: administration blacklist et avis.
 - `Web/middleware/authMiddleware.js`: vérifie le cookie JWT, hydrate `req.user` depuis la DB, et protège les routes (redirige vers `/login` si non authentifié).
 - `Web/config/database.js`: initialisation SQLite (tables `password`, `users`, `avis`, `badges`) et export du handle `db`.
 - `Web/config/blacklist.*`: gestion d’emails interdits (purge planifiée via CRON dans `index.js`).
@@ -126,7 +126,7 @@ Confiancy/
 - Pour changer le style de l’accueil, modifier `Web/public/css/index.css`.
 
 ## Contribuer
-1. Forker le repo, créer une branche: `feat/ma-feature`
+1. Forker le repo
 2. Commits clairs (ex: `feat(index): améliore le style`)
 3. PR vers `main` (cf. conventions du projet)
 
