@@ -46,7 +46,14 @@
                                     year: 'numeric',
                                     month: 'long',
                                     day: 'numeric'
-                                }) %></em></p>
+                                }) %></em>
+                            </p>
+                            <% if (r.reviewerId == viewerId) { %>
+                                <form class="delete-review" method="post" action="/api/reviews/<%= user.userId %>/delete">
+                                    <input type="hidden" name="reviewerId" value="<%= r.reviewerId %>">
+                                    <button type="submit">Supprimer mon avis</button>
+                                </form>
+                            <% } %>
                         </div>
                     <% }) %>
                 <% } %>

@@ -125,4 +125,21 @@ router.post('/:targetId', verifyToken, express.json(), async (req, res) => {
     }
 });
 
+router.post('/:targetId/delete', verifyToken, express.json(), async (req, res) => {
+    const authorId = req.user && req.user.id;
+    if (!authorId) return res.status(401).redirect('/login');
+    const targetId = Number(req.params.targetId);
+    if (targetId === authorId) return res.status(400).json({ error: "You can't delete a review for yourself" });
+    if (!targetId) return res.status(400).redirect('/user/' + targetId);
+
+    try {
+        await runAsync(`DELETE FROM avis WHERE authorId = ? AND targetId = ?`, [authorId, targetId]);
+        console.log(`[REVIEWS] Review by ${authorId} for ${targetId} deleted.`.green);
+        return res.status(200).redirect(`/user/${targetId}`);
+    } catch (err) {
+        console.error('[REVIEWS] Error deleting review'.red, err);
+        return res.status(500).redirect(`/user/${targetId}`);
+    }
+});
+
 module.exports = router;
