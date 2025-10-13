@@ -1,14 +1,16 @@
 # Confiancy
 
-Application web Node.js/Express permettant l'authentification (classique + OAuth2), la gestion d'utilisateurs, et un tableau de bord avec avis/notes. Front public servi depuis `Web/public`, vues EJS pour les pages de session et de profil.
+Confiancy est une application web Node.js/Express permettant de donner et recevoir des avis sur les utilisateurs — d'où son nom !  
+Chaque utilisateur peut recevoir des notes/commentaires d'autres membres, ce qui favorise la confiance au sein de la plateforme.
 
-## Fonctionnalités
+## Fonctionnalités principales
 - Authentification email/mot de passe (JWT via cookie HttpOnly)
 - Vérification d'email par code (envoi via SMTP)
-- OAuth2: Discord et GitHub (login et liaison de compte)
-- Tableau de bord protégé, profil, et avis entre utilisateurs
-- Limiteur de débit global, cookies, statique, et rendu EJS
-- Tâche CRON pour purge de la blacklist
+- Connexion et liaison de comptes via OAuth2 (Discord & GitHub)
+- Tableau de bord protégé, gestion du profil et avis entre utilisateurs
+- Notation et dépôt d'avis sur d'autres profils utilisateurs
+- Limiteur de débit global, gestion des cookies, fichiers statiques et rendu EJS
+- Tâche CRON pour la purge automatique de la blacklist
 
 ## Pile technique
 - Node.js (CommonJS), Express 5
