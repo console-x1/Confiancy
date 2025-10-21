@@ -10,47 +10,66 @@ const verifyToken = require('../middleware/authMiddleware');
 console.log('[INIT] - Start Oauth2.js'.blue)
 
 async function getUserBy(email, type) {
+
     return await new Promise((resolve, reject) => {
+    
         db.get(`SELECT * FROM password WHERE ${type} = ?`, [email], (err, user) => {
+    
             if (err) {
                 reject(err);
             } else {
                 resolve(user);
             }
+    
         });
+    
     });
 }
 
 async function discordOauth2(code, req, type) {
+
     const tokenRes = await fetch('https://discord.com/api/oauth2/token', {
+
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+
         body: new URLSearchParams({
+
             client_id: process.env.CLIENT_ID,
             client_secret: process.env.CLIENT_SECRET,
             grant_type: 'authorization_code',
             code,
             redirect_uri: `${req.protocol}://${req.get('host')}/api/Oauth2/discord/${type}`
+
         })
+
     });
 
     const tokenData = await tokenRes.json();
     const accessToken = tokenData.access_token;
 
     const userRes = await fetch('https://discord.com/api/users/@me', {
+
         headers: { Authorization: `Bearer ${accessToken}` }
+
     });
 
     return await userRes.json();
+
 }
 
 router.get("/discord/register/getUrl", verifyToken, async (req, res) => {
+
     const state = jwt.sign(
+    
         { userId: req.user.id },
         process.env.STATE_SECRET,
         { expiresIn: '10m' }
+    
     );
+    
     res.redirect(`https://discord.com/oauth2/authorize?client_id=${process.env.CLIENT_ID}&redirect_uri=${encodeURIComponent(`${req.protocol}://${req.get('host')}/api/Oauth2/discord/register`)}&response_type=code&scope=identify email&state=${state}`)
+
 })
 router.get("/discord/register", async (req, res) => {
     try {
