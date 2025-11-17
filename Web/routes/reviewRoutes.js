@@ -133,6 +133,9 @@ router.post('/:targetId/delete', verifyToken, express.json(), async (req, res) =
     if (!targetId) return res.status(400).redirect('/user/' + targetId);
 
     try {
+        const runAsync = (sql, params) => new Promise((resolve, reject) => {
+            db.run(sql, params, function (err) { if (err) reject(err); else resolve(this); });
+        });
         await runAsync(`DELETE FROM avis WHERE authorId = ? AND targetId = ?`, [authorId, targetId]);
         console.log(`[REVIEWS] Review by ${authorId} for ${targetId} deleted.`.green);
         return res.status(200).redirect(`/user/${targetId}`);
