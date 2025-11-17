@@ -35,15 +35,21 @@ router.get("/avis", verifyToken, async (req, res) => {
         async (err, rows) => {
             let grouped = [];
 
+            rows.reverse();
+
             if (!err && rows) {
                 grouped = rows.map(r => {
                     let avis;
-                    try { avis = JSON.parse(r.avis); } catch { avis = r.avis; }
+                    try { 
+                        avis = JSON.parse(r.avis); 
+                    } catch { 
+                        avis = r.avis; 
+                    }
                     return {
                         reviewer: r.reviewer || r.authorId,
                         reviewerId: r.authorId,
                         reviewerPage: `${req.protocol}://${req.get('host')}/user/${r.authorId}`,
-                        note: r.note + '/10',
+                        note: r.note,
                         comment: avis,
                         date: new Date(r.date).toLocaleDateString('fr-FR', {
                             year: 'numeric',
@@ -54,8 +60,12 @@ router.get("/avis", verifyToken, async (req, res) => {
                 });
             }
 
-            res.json({ reviews: grouped })
+        // Renvoyer le template HTML au lieu du JSON
+        res.render(path.join(__dirname, "../login/avis"), { 
+            reviews: grouped,
+            user: req.user
         });
+    });
 });
 
 router.get("/logout", (req, res) => {

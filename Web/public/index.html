@@ -4,37 +4,131 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Confiancy • Accueil</title>
-    <meta name="description" content="Bienvenue sur Confiancy">
-    <link rel="stylesheet" href="./css/index.css">
+    <title>Confiancy • Réseau de Confiance</title>
+    <meta name="description" content="Construisez votre réseau de confiance - Notez et évaluez les autres utilisateurs">
+    <meta name="keywords" content="Confiancy, Réseau de Confiance, Évaluation, Fiabilité, Avis Utilisateurs, Communauté Fiable, Réputation, Notation, Confiance en Ligne, Sécurité, Transparence, Feedback, Profil de Confiance, Confiancy, Réseau Social">
+    <meta name="author" content="console-x1">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="title" content="Confiancy • Réseau de Confiance">
     <link rel="icon" href="./media/logoCircle.png">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-    </head>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-<body>
-    <div class="container">
-        <div class="glass-effect glass-1"></div>
-        <div class="glass-effect glass-2"></div>
+    <style>
+        html {
+            background-color: #131b2d;
+            z-index: -1;
+        }
+    </style>
 
-        <section class="login-box" role="region" aria-labelledby="page-title">
-            <a href="./index.html">
-                <img class="logo" src="./media/logo.png" alt="Logo">
-            </a>
+    <script src="./javascript/tailwind.min.js"></script>
 
-            <h1 id="page-title" class="header">Bienvenue sur Confiancy</h1>
-            <p class="subtitle">Choisissez une action pour continuer.</p>
+    <style type="text/tailwindcss">
+        @layer base {
+            body {
+                font-family: 'Inter', sans-serif;
+                min-height: 100vh;
+            }
+                
+            ::-webkit-scrollbar {
+                width: 6px;
+            }
+                
+            ::-webkit-scrollbar-track {
+                background: transparent;
+            }
+                
+            ::-webkit-scrollbar-thumb {
+                background: rgba(59, 130, 246, 0.3);
+                border-radius: 3px;
+            }
+                
+            ::-webkit-scrollbar-thumb:hover {
+                background: rgba(59, 130, 246, 0.5);
+            }
+                
+            * {
+                scrollbar-width: thin;
+                scrollbar-color: rgba(59, 130, 246, 0.3) transparent;
+            }
+                
+            .trust-badge {
+                background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            }
+        }
+    </style>
+</head>
 
-            <nav class="actions" aria-label="Actions principales">
-                <a class="button button-primary" href="./login.html">Se connecter</a>
-                <a class="button button-secondary" href="./register.html">Créer un compte</a>
-                <a class="button button-ghost" href="/dashboard">Tableau de bord</a>
-            </nav>
+<body class="min-h-screen flex items-center justify-center p-10">
 
-            <div class="footer">
-                <p>Besoin d'aide ? <a class="link" href="./login.html">Connexion</a> • <a class="link" href="./register.html">Inscription</a></p>
-            </div>
-        </section>
+    <div class="fixed inset-0 -z-0 pointer-events-none">
+        <div
+            class="absolute top-0 left-0 w-32 h-32 bg-blue-500 rounded-full mix-blend-multiply filter blur-2xl opacity-10 animate-pulse">
+        </div>
+        <div
+            class="absolute bottom-0 right-0 w-32 h-32 bg-violet-500 rounded-full mix-blend-multiply filter blur-2xl opacity-10 animate-pulse delay-1500">
+        </div>
     </div>
+
+    <section
+        class="relative w-full max-w-md bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-8 shadow-2xl">
+
+        <div class="flex justify-center mb-6">
+            <div class="trust-badge w-20 h-20 rounded-2xl flex items-center justify-center animate-pulse">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-white" viewBox="0 0 20 20"
+                    fill="currentColor">
+                    <path fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clip-rule="evenodd" />
+                </svg>
+            </div>
+        </div>
+
+        <h1 class="text-2xl md:text-3xl font-bold text-center text-white mb-3">
+            Bienvenue sur <span class="text-blue-400">Confiancy</span>
+        </h1>
+
+        <p class="text-center text-gray-300 mb-8 leading-relaxed">
+            Construisez votre réseau de confiance.<br>
+            <span class="text-blue-300 font-medium">Notez, évaluez et prouvez votre fiabilité.</span>
+        </p>
+
+        <div class="grid grid-cols-3 gap-4 mb-8">
+            <div class="text-center">
+                <div class="text-2xl font-bold text-blue-400">X</div>
+                <div class="text-xs text-gray-400">Utilisateurs</div>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-green-400">X</div>
+                <div class="text-xs text-gray-400">Avis</div>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-purple-400">1</div>
+                <div class="text-xs text-gray-400">Partenaire</div>
+            </div>
+        </div>
+
+        <nav class="space-y-3" aria-label="Actions principales">
+            <a href="./login"
+                class="block w-full py-4 px-6 text-center font-semibold rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-200 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                Se connecter
+            </a>
+            <a href="./register"
+                class="block w-full py-4 px-6 text-center font-semibold rounded-xl bg-white/10 border border-white/20 hover:bg-white/20 transition-colors duration-200 text-white">
+                Créer un compte gratuit
+            </a>
+            <a href="/dashboard"
+                class="block w-full py-3 px-6 text-center text-sm font-medium rounded-xl text-gray-300 hover:text-white hover:bg-white/5 transition-colors duration-200">
+                Explorer le tableau de bord
+            </a>
+        </nav>
+
+        <div class="mt-8 p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl">
+            <p class="text-center text-sm text-blue-300">
+                <span class="font-semibold">Votre réputation = Votre valeur</span><br>
+                Chaque avis compte pour construire une communauté fiable.
+            </p>
+        </div>
+    </section>
 </body>
 
 </html>

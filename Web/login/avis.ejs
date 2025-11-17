@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes Avis - Confiancy</title>
+    <link rel="icon" href="../media/logoCircle.png">
+
+    <style>
+        html {
+            background-color: #131b2d;
+            z-index: -1;
+        }
+    </style>
+
+    <script src="../javascript/tailwind.min.js"></script>
+
+    <style type="text/tailwindcss">
+        @layer base {
+            body {
+                font-family: 'Inter', sans-serif;
+                min-height: 100vh;
+            }
+                
+            ::-webkit-scrollbar {
+                width: 6px;
+            }
+                
+            ::-webkit-scrollbar-track {
+                background: transparent;
+            }
+                
+            ::-webkit-scrollbar-thumb {
+                background: rgba(59, 130, 246, 0.3);
+                border-radius: 3px;
+            }
+                
+            ::-webkit-scrollbar-thumb:hover {
+                background: rgba(59, 130, 246, 0.5);
+            }
+                
+            * {
+                scrollbar-width: thin;
+                scrollbar-color: rgba(59, 130, 246, 0.3) transparent;
+            }
+                
+            .trust-badge {
+                background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            }
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center p-10">
+
+    <div class="fixed inset-0 -z-0 pointer-events-none">
+        <div
+            class="absolute top-0 left-0 w-32 h-32 bg-blue-500 rounded-full mix-blend-multiply filter blur-2xl opacity-10 animate-pulse">
+        </div>
+        <div
+            class="absolute bottom-0 right-0 w-32 h-32 bg-violet-500 rounded-full mix-blend-multiply filter blur-2xl opacity-10 animate-pulse delay-1500">
+        </div>
+    </div>
+
+      <div class="max-w-4xl mx-auto">
+    <!-- HEADER -->
+    <div class="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 mb-6">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 class="text-2xl font-bold text-white">⭐ Vos Avis</h1>
+          <p class="text-gray-400">Tous les avis que vous avez reçus</p>
+        </div>
+        <button onclick="window.location.href='/dashboard'" 
+                class="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white transition-colors duration-200">
+          ← Retour au tableau de bord
+        </button>
+      </div>
+    </div>
+
+    <div class="space-y-4">
+      <% if (!reviews || reviews.length === 0) { %>
+        <div class="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-12 text-center">
+          <div class="text-4xl mb-4">📝</div>
+          <h2 class="text-xl font-semibold text-white mb-2">Aucun avis pour le moment</h2>
+          <p class="text-gray-400">Vous n'avez pas encore reçu d'avis sur Confiancy.</p>
+        </div>
+      <% } else { %>
+        <% 
+          const totalReviews = reviews.length;
+          const avgNote = totalReviews > 0 ? 
+            (reviews.reduce((sum, r) => sum + parseInt(r.note), 0) / totalReviews).toFixed(1) : 
+            '0.0';
+          const withComments = reviews.filter(r => r.comment).length;
+        %>
+        
+        <div class="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6">
+          <h3 class="text-lg font-semibold text-white mb-4">📊 Vos statistiques</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="text-center p-4 bg-blue-500/10 rounded-xl">
+              <div class="text-2xl font-bold text-blue-400"><%= totalReviews %></div>
+              <div class="text-gray-400">Avis reçus</div>
+            </div>
+            <div class="text-center p-4 bg-yellow-500/10 rounded-xl">
+              <div class="text-2xl font-bold text-yellow-400"><%= avgNote %>/10</div>
+              <div class="text-gray-400">Note moyenne</div>
+            </div>
+            <div class="text-center p-4 bg-green-500/10 rounded-xl">
+              <div class="text-2xl font-bold text-green-400"><%= withComments %></div>
+              <div class="text-gray-400">Commentaires</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- REVIEWS -->
+        <div class="space-y-3">
+          <% reviews.forEach((review, index) => { %>
+            <div class="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-4 hover:bg-white/10 transition-all duration-200">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-blue-700 rounded-full flex items-center justify-center text-xs font-bold text-white">
+                    <%= index + 1 %>
+                  </div>
+                  <div>
+                    <h3 class="font-medium text-white text-sm">
+                      Pour : <a href="<%= review.reviewerPage %>" class="text-blue-400 hover:text-blue-300 underline">
+                        <%= review.reviewer %>
+                      </a>
+                    </h3>
+                    <p class="text-xs text-gray-400"><%= review.date %></p>
+                  </div>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                  <span class="text-yellow-400 text-sm">★</span>
+                  <span class="font-bold text-white text-sm"><%= review.note %>/10</span>
+                </div>
+              </div>
+              
+              <% if (review.comment) { %>
+                <div class="mt-2 p-2 bg-white/5 rounded-lg border border-white/10">
+                  <p class="text-gray-300 text-xs italic">"<%= review.comment %>"</p>
+                </div>
+              <% } %>
+            </div>
+          <% }); %>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</body>
+
+</html>

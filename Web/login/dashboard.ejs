@@ -1,92 +1,130 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tableau de bord</title>
   <link rel="icon" href="../media/logoCircle.png">
-  <style>
-    body {
-      background-color: #0f0f0f;
-      color: #f0f0f0;
-      font-family: 'Segoe UI', sans-serif;
-      padding: 2rem;
-    }
 
-    .container {
-      max-width: 700px;
-      margin: auto;
-      background-color: #1a1a1a;
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
-    }
+    <style>
+        html {
+            background-color: #131b2d;
+            z-index: -1;
+        }
+    </style>
 
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 1rem;
-      color: #ffffff;
-    }
+    <script src="./javascript/tailwind.min.js"></script>
 
-    .info {
-      margin-bottom: 2rem;
-      font-size: 1.1rem;
-    }
-
-    .link-box {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    a {
-      display: inline-block;
-      padding: 0.8rem 1.2rem;
-      background-color: #3c3c3c;
-      color: #fff;
-      text-decoration: none;
-      border-radius: 8px;
-      transition: background-color 0.2s ease;
-    }
-
-    a:hover {
-      background-color: #555;
-    }
-
-    .linked {
-      color: #00ff99;
-      font-weight: bold;
-    }
-  </style>
+    <style type="text/tailwindcss">
+        @layer base {
+            body {
+                font-family: 'Inter', sans-serif;
+                min-height: 100vh;
+            }
+                
+            ::-webkit-scrollbar {
+                width: 6px;
+            }
+                
+            ::-webkit-scrollbar-track {
+                background: transparent;
+            }
+                
+            ::-webkit-scrollbar-thumb {
+                background: rgba(59, 130, 246, 0.3);
+                border-radius: 3px;
+            }
+                
+            ::-webkit-scrollbar-thumb:hover {
+                background: rgba(59, 130, 246, 0.5);
+            }
+                
+            * {
+                scrollbar-width: thin;
+                scrollbar-color: rgba(59, 130, 246, 0.3) transparent;
+            }
+                
+            .trust-badge {
+                background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            }
+        }
+    </style>
 </head>
-<body>
-  <div class="container">
-    <h1>👤 Tableau de bord</h1>
 
-    <% 
-      const startsWithVowel = /^[aeiouyAEIOUY]/.test(user.username);
-      const prefix = startsWithVowel ? "qu’" : "que ";
-    %>
+<body class="min-h-screen flex items-center justify-center p-10">
 
-    <p class="info">Connecté en tant <%= prefix %><strong><%= user.username %></strong></p>
+  <div class="fixed inset-0 -z-0 pointer-events-none">
+    <div
+      class="absolute top-0 left-0 w-32 h-32 bg-blue-500 rounded-full mix-blend-multiply filter blur-2xl opacity-10 animate-pulse">
+    </div>
+    <div
+      class="absolute bottom-0 right-0 w-32 h-32 bg-violet-500 rounded-full mix-blend-multiply filter blur-2xl opacity-10 animate-pulse delay-1500">
+    </div>
+  </div>
 
-    <button onclick="window.location.href='<%= baseUrl %>/dashboard/logout'" style="margin-bottom: 20px; padding: 10px 15px; background-color: #ff1900; color: white; border: none; border-radius: 5px; cursor: pointer;">🔒 Se déconnecter</button>
-    <button onclick="window.location.href='<%= baseUrl %>/dashboard/delete-account'" style="margin-bottom: 20px; padding: 10px 15px; background-color: #ff1900; color: white; border: none; border-radius: 5px; cursor: pointer;">🗑️ Supprimer mon compte</button>
-    <button onclick="window.location.href='<%= baseUrl %>/dashboard/avis'" style="margin-bottom: 20px; padding: 10px 15px; background-color: #2980b9; color: white; border: none; border-radius: 5px; cursor: pointer;">⭐ Voir tous mes avis</button>
-    <button onclick="window.location.href='<%= baseUrl %>/user/<%= user.id %>'" style="margin-bottom: 20px; padding: 10px 15px; background-color: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer;">📚 Voir ma page publique</button>
+  <div class="w-full max-w-2xl bg-[#1a1a1a] rounded-xl shadow-2xl p-8">
 
-    <div class="link-box">
+    <h1 class="text-3xl font-bold text-white mb-6">👤 Tableau de bord</h1>
+
+    <% const startsWithVowel=/^[aeiouyAEIOUY]/.test(user.username); const prefix=startsWithVowel ? "qu’" : "que " ; %>
+
+    <p class="text-xl mb-8 text-gray-300">
+      Connecté en tant <%= prefix %><span class="font-bold text-blue-400">
+          <%= user.username %>
+        </span>
+    </p>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+      <button onclick="window.location.href='<%= baseUrl %>/dashboard/logout'"
+        class="py-3 px-4 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors duration-200 flex items-center justify-center gap-2">
+        🔒 Se déconnecter
+      </button>
+
+      <button onclick="window.location.href='<%= baseUrl %>/dashboard/delete-account'"
+        class="py-3 px-4 bg-red-700 hover:bg-red-800 text-white font-semibold rounded-lg transition-colors duration-200 flex items-center justify-center gap-2">
+        🗑️ Supprimer mon compte
+      </button>
+
+      <button onclick="window.location.href='<%= baseUrl %>/dashboard/avis'"
+        class="py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors duration-200 flex items-center justify-center gap-2">
+        ⭐ Voir tous mes avis
+      </button>
+
+      <button onclick="window.location.href='<%= baseUrl %>/user/<%= user.id %>'"
+        class="py-3 px-4 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors duration-200 flex items-center justify-center gap-2">
+        📚 Voir ma page publique
+      </button>
+    </div>
+
+    <div class="space-y-4">
+      <h2 class="text-xl font-semibold text-white mb-4">🔗 Comptes externes</h2>
+
       <% if (!user.discord) { %>
-        <a href="<%= baseUrl %>/api/Oauth2/discord/register/getUrl">🔗 Lier mon compte à Discord</a>
+        <a href="<%= baseUrl %>/api/Oauth2/discord/register/getUrl"
+          class="block py-4 px-6 bg-[#3c3c3c] hover:bg-[#555] text-white rounded-lg transition-colors duration-200 text-center font-medium">
+          Lier mon compte à Discord
+        </a>
       <% } else { %>
-        <p class="linked">✅ Compte Discord déjà lié</p>
+        <div
+          class="py-4 px-6 bg-green-900/30 border border-green-500/30 text-green-400 rounded-lg text-center font-bold">
+          ✅ Compte Discord déjà lié
+        </div>
       <% } %>
 
       <% if (!user.github) { %>
-        <a href="<%= baseUrl %>/api/Oauth2/github/register/getUrl">🔗 Lier mon compte à GitHub</a>
+        <a href="<%= baseUrl %>/api/Oauth2/github/register/getUrl"
+          class="block py-4 px-6 bg-[#3c3c3c] hover:bg-[#555] text-white rounded-lg transition-colors duration-200 text-center font-medium">
+          Lier mon compte à GitHub
+        </a>
       <% } else { %>
-        <p class="linked">✅ Compte GitHub déjà lié</p>
+        <div
+          class="py-4 px-6 bg-green-900/30 border border-green-500/30 text-green-400 rounded-lg text-center font-bold">
+          ✅ Compte GitHub déjà lié
+        </div>
       <% } %>
     </div>
   </div>
 </body>
+
 </html>

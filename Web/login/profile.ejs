@@ -7,69 +7,175 @@
     <title>
         <%= user.username %>
     </title>
-    <link rel="stylesheet" href="../css/profile.css">
     <link rel="icon" href="../media/logoCircle.png">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        html {
+            background-color: #131b2d;
+            z-index: -1;
+        }
+    </style>
+
+    <script src="../javascript/tailwind.min.js"></script>
+
+    <style type="text/tailwindcss">
+        @layer base {
+            body {
+                font-family: 'Inter', sans-serif;
+                min-height: 100vh;
+            }
+                
+            ::-webkit-scrollbar {
+                width: 6px;
+            }
+                
+            ::-webkit-scrollbar-track {
+                background: transparent;
+            }
+                
+            ::-webkit-scrollbar-thumb {
+                background: rgba(59, 130, 246, 0.3);
+                border-radius: 3px;
+            }
+                
+            ::-webkit-scrollbar-thumb:hover {
+                background: rgba(59, 130, 246, 0.5);
+            }
+                
+            * {
+                scrollbar-width: thin;
+                scrollbar-color: rgba(59, 130, 246, 0.3) transparent;
+            }
+                
+            .trust-badge {
+                background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            }
+        }
+    </style>
 </head>
 
-<body>
-    <div class="container">
-        <div class="glass-effect glass-1"></div>
-        <div class="glass-effect glass-2"></div>
+<body class="min-h-screen flex items-center justify-center p-10">
 
-        <div class="profil-box">
-            <img class="logo" src="<%= user.avatar ? user.avatar : '../media/defaultAvatar.png' %>" alt="Logo">
+    <div class="fixed inset-0 -z-0 pointer-events-none">
+        <div
+            class="absolute top-0 left-0 w-32 h-32 bg-blue-500 rounded-full mix-blend-multiply filter blur-2xl opacity-10 animate-pulse">
+        </div>
+        <div
+            class="absolute bottom-0 right-0 w-32 h-32 bg-violet-500 rounded-full mix-blend-multiply filter blur-2xl opacity-10 animate-pulse delay-1500">
+        </div>
+    </div>
 
-            <h1 class="header">
+    <div class="container w-full max-w-2xl">
+        <div class="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-8" role="main">
+
+            <!-- AVATAR -->
+            <div class="flex justify-center mb-6">
+                <img class="w-32 h-32 rounded-full border-4 border-blue-500/30"
+                    src="<%= user.avatar ? user.avatar : '../media/defaultAvatar.png' %>"
+                    alt="Avatar de <%= user.username %>">
+            </div>
+
+            <h1 class="text-3xl font-bold text-center text-white mb-2">
                 <%= user.username %>
             </h1>
 
-            <div class="score">
-                <p><strong>Score :</strong> <%= Score %>/100 (<%= Count %> avis)</p>
+            <div class="text-center mb-8">
+                <div class="inline-block px-6 py-3 bg-blue-500/20 border border-blue-500/30 rounded-full">
+                    <p class="text-blue-300 font-semibold">
+                        <strong>Score :</strong> <span class="text-2xl text-white">
+                            <%= Score %>
+                        </span>/100
+                        <span class="text-gray-400 text-sm">(<%= Count %> avis)</span>
+                    </p>
+                </div>
             </div>
 
             <div class="avis">
-                <br>
-                <h2>Avis :</h2>
-                <% const list = reviewsGrouped ? reviewsGrouped : []; %>
-                <% if (list.length === 0) { %>
-                    <p>Aucun avis.</p>
-                <% } else { %>
-                    <% list.forEach(r => { %>
-                        <div class="review">
-                            <p><strong>De :</strong> <a href="/user/<%= r.reviewerId %>"><%= r.reviewer %></a></p>
-                            <p><strong>Note :</strong> <%= r.note %>/10</p>
-                            <% if (r.comment) { %>
-                                <p><strong>Commentaire :</strong> <%= r.comment %></p>
-                            <% } %>
-                            <p><em>Le <%= new Date(r.date).toLocaleDateString('fr-FR', {
-                                    year: 'numeric',
-                                    month: 'long',
-                                    day: 'numeric'
-                                }) %></em>
-                            </p>
-                            <% if (r.reviewerId == viewerId) { %>
-                                <form class="delete-review" method="post" action="/api/reviews/<%= user.userId %>/delete">
-                                    <input type="hidden" name="reviewerId" value="<%= r.reviewerId %>">
-                                    <button type="submit">Supprimer mon avis</button>
-                                </form>
-                            <% } %>
-                        </div>
-                    <% }) %>
-                <% } %>
-                <br>
+                <h2 class="text-2xl font-semibold text-white mb-6 pb-2 border-b border-white/10">Avis</h2>
 
-                <% if (viewerId !== null && viewerId !== user.userId) { %>
-                    <% if (alreadyReviewed) { %>
-                        <p>Vous avez déjà laissé un avis.</p>
-                    <% } else { %>
-                        <form class="add-review" method="post" action="/api/reviews/<%= user.userId %>">
-                            <label>Note (1-10): <input name="note" type="number" min="1" max="10" required></label>
-                            <label>Commentaire: <input name="comment" type="text" autocomplete="off" minlength="10" maxlength="512"></label>
-                            <button type="submit">Ajouter un avis</button>
-                        </form>
-                    <% } %>
-                    <br>
+                <% const list=reviewsGrouped ? reviewsGrouped : []; %>
+                <% if (list.length===0) { %>
+                    <div class="text-center py-8">
+                        <p class="text-gray-400">Aucun avis pour le moment.</p>
+                    </div>
+                <% } else { %>
+                    <div class="space-y-6">
+                        <% list.forEach(r=> { %>
+                            <div class="bg-white/5 border border-white/10 rounded-xl p-6">
+                                <div class="flex justify-between items-start mb-3">
+                                    <div>
+                                       <p class="text-white"><strong>De :</strong>
+                                            <a href="/user/<%= r.reviewerId %>"
+                                                class="text-blue-400 hover:text-blue-300 underline">
+                                                <%= r.reviewer %>
+                                            </a>
+                                        </p>
+                                        <p class="text-white"><strong>Note :</strong>
+                                            <span class="text-yellow-400 font-semibold">
+                                                <%= r.note %>/10
+                                            </span>
+                                        </p>
+                                    </div>
+                                    <p class="text-gray-400 text-sm">
+                                        <%= new Date(r.date).toLocaleDateString('fr-FR', { year: 'numeric' ,
+                                            month: 'short' , day: 'numeric' }) %>
+                                    </p>
+                                </div>
+
+                                <% if (r.comment) { %>
+                                    <div class="mt-3 p-3 bg-white/5 rounded-lg">
+                                        <p class="text-gray-300 italic">"<%= r.comment %>"</p>
+                                    </div>
+                                <% } %>
+
+                                <% if (r.reviewerId==viewerId) { %>
+                                    <form class="delete-review mt-4 pt-4 border-t border-white/10"
+                                        method="post" action="/api/reviews/<%= user.userId %>/delete">
+                                        <input type="hidden" name="reviewerId"
+                                            value="<%= r.reviewerId %>">
+                                        <button type="submit"
+                                            class="px-4 py-2 bg-red-500/20 border border-red-500/30 rounded-lg text-red-400 hover:bg-red-500/30 transition-colors duration-200">
+                                            Supprimer mon avis
+                                        </button>
+                                    </form>
+                                <% } %>
+                            </div>
+                        <% }) %>
+                    </div>
+                <% } %>
+
+                <% if (viewerId !==null && viewerId !==user.userId) { %>
+                    <div class="mt-8 pt-6 border-t border-white/10">
+                        <% if (alreadyReviewed) { %>
+                            <div class="text-center py-4">
+                                <p class="text-green-400">✅ Vous avez déjà laissé un avis.</p>
+                            </div>
+                        <% } else { %>
+                            <h3 class="text-xl font-semibold text-white mb-4">Ajouter votre avis
+                            </h3>
+                            <form class="add-review space-y-4" method="post"
+                                action="/api/reviews/<%= user.userId %>">
+                                <div>
+                                    <label class="block text-gray-300 mb-2">Note (1-10):</label>
+                                    <input name="note" type="number" min="1" max="10" required
+                                        class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+
+                                <div>
+                                    <label class="block text-gray-300 mb-2">Commentaire:</label>
+                                    <input name="comment" type="text" autocomplete="off"
+                                        minlength="10" maxlength="512"
+                                        class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+
+                                <button type="submit"
+                                    class="w-full py-3 px-6 font-semibold rounded-xl bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 transition-all duration-200 text-white shadow-lg hover:shadow-xl">
+                                    Ajouter un avis
+                                </button>
+                            </form>
+                        <% } %>
+                    </div>
                 <% } %>
             </div>
         </div>
