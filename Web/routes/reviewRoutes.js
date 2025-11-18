@@ -63,7 +63,7 @@ function computeUserScore({ weightedSum, weightTotal }) {
     return score100;
 }
 
-async function sendEmail(authorId, targetId, note, req, comment) {
+async function sendEmail(authorId, targetId, note, comment, req) {
     const getAsync = (sql, params) => new Promise((resolve, reject) => {
         db.get(sql, params, (err, row) => err ? reject(err) : resolve(row));
     });
@@ -247,7 +247,6 @@ router.post('/:targetId', verifyToken, express.json(), async (req, res) => {
     const { note, comment } = req.body;
     const rating = Number(note);
 
-    // On force un rating entre 1 et 10 (comme ton ancien check !rating qui excluait 0)
     if (Number.isNaN(rating) || rating < 1 || rating > 10) {
         return res.status(400).redirect('/user/' + targetId);
     }
@@ -360,7 +359,7 @@ router.post('/:targetId', verifyToken, express.json(), async (req, res) => {
             `(weight=${weight.toFixed(3)}). Updated Score to ${newScore}% based on ${newCount} reviews.`.green
         );
 
-        sendEmail(authorId, targetId, newScore, req)
+        sendEmail(authorId, targetId, rating, comment, req)
 
         return res.status(200).redirect(`/user/${targetId}`);
     } catch (err) {
