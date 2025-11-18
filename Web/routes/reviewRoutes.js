@@ -176,7 +176,7 @@ async function sendEmail(authorId, targetId, note, comment, req) {
                     <div class="review-card">
                         <p style="color: white;"><a href="${req.protocol}://${req.get('host')}/user/${authorId}"><span class="author">${author.username}</span></a> vous a donné une note de :</p>
                         <div class="rating">
-                            ${Number(note/10)}/10 ⭐
+                            ${Number(note)}/10 ⭐
                         </div>
                         ${comment ? `<div style="background: #333; padding: 15px; border-radius: 6px; margin-top: 15px; font-style: italic;">
                             <p style="margin: 0;">"${comment}"</p>
