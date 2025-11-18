@@ -56,28 +56,111 @@ async function sendCode(email, transporter, code, req) {
     await transporter.sendMail({
         from: `"${process.env.APP_NAME}" <${process.env.SMTP_USER}>`,
         to: email,
-        subject: 'Votre code de vérification',
+        subject: 'Votre code de vérification - Confiancy',
         text: `Bonjour,\n\nVoici votre code de vérification : ${code}\n\nUtilisez-le ici : ${req.protocol}://${req.get('host')}/verify-email\n\nSi vous n'avez pas demandé ce code, ignorez simplement cet email.`,
         html: `
-            <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
-            <h2 style="color: #2c3e50;">Vérification de votre adresse email</h2>
-            <p>Bonjour,</p>
-            <p>Voici votre code de vérification :</p>
-            <p style="font-size: 20px; font-weight: bold; color: #2c3e50; background: #f4f4f4; padding: 10px; display: inline-block; border-radius: 5px;">
-                ${code}
-            </p>
-            <p>Vous pouvez également cliquer sur le bouton ci-dessous pour finaliser la vérification :</p>
-            <p>
-                <a href="${req.protocol}://${req.get('host')}/verify-email" 
-                style="background: #ffae00ff; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px;">
-                Vérifier mon email
-                </a>
-            </p>
-            <p style="font-size: 11px; color: #999 ;margin-top: 10px;">
-                Si vous n'avez pas demandé ce code, ignorez simplement cet email.
-            </p>
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8">
+        <style>
+            body {
+                font-family: 'Segoe UI', Arial, sans-serif;
+                line-height: 1.6;
+                color: #f0f0f0;
+                background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+                margin: 0;
+                padding: 0;
+            }
+            .container {
+                max-width: 600px;
+                margin: 20px auto;
+                background: #1a1a1a;
+                border-radius: 12px;
+                overflow: hidden;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            }
+            .header {
+                background: linear-gradient(135deg, #2196F3 0%, #0D47A1 100%);
+                padding: 30px;
+                text-align: center;
+            }
+            .content {
+                padding: 30px;
+            }
+            .code {
+                font-size: 24px;
+                font-weight: bold;
+                color: #2196F3;
+                background: #2a2a2a;
+                padding: 15px 25px;
+                display: inline-block;
+                border-radius: 8px;
+                border: 1px solid #2196F3;
+                letter-spacing: 3px;
+                margin: 20px 0;
+                font-family: 'Courier New', monospace;
+            }
+            .button {
+                display: inline-block;
+                background: linear-gradient(135deg, #2196F3 0%, #0D47A1 100%);
+                color: white !important;
+                padding: 15px 30px;
+                text-decoration: none;
+                border-radius: 8px;
+                font-weight: bold;
+                margin: 20px 0;
+                border: none;
+                cursor: pointer;
+                transition: transform 0.2s ease;
+            }
+            .button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(33, 150, 243, 0.3);
+            }
+            .footer {
+                background: #2a2a2a;
+                padding: 20px;
+                text-align: center;
+                font-size: 12px;
+                color: #888;
+                border-top: 1px solid #333;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1 style="color: white; margin: 0; font-size: 28px;">🔐 Confiancy</h1>
+                <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0;">Vérification de votre adresse email</p>
             </div>
-        `
+            
+            <div class="content">
+                <h2 style="color: white;">Bonjour,</h2>
+                <p style="color: white;">Vous recevez cet email car vous avez demandé à vérifier votre adresse email sur Confiancy.</p>
+                
+                <p style="color: white;"><strong>Votre code de vérification est :</strong></p>
+                <div class="code">${code}</div>
+                
+                <div style="text-align: center;">
+                    <a href="${req.protocol}://${req.get('host')}/dashboard" class="button">
+                        ✅ Vérifier mon email
+                    </a>
+                </div>
+                
+                <p style="color: red;">Si vous n'avez pas demandé ce code, vous pouvez ignorer cet email en toute sécurité.</p>
+            </div>
+            
+            <div class="footer">
+                <p style="color: white;">Cet email a été envoyé par Confiancy - Votre réseau de confiance</p>
+                <p style="margin-top: 10px;">
+                    <a href="${req.protocol}://${req.get('host')}" style="color: #2196F3; text-decoration: none;">Confiancy.app</a>
+                </p>
+            </div>
+        </div>
+    </body>
+    </html>
+`
     });
 
     console.log('[EMAIL-SEND] Verify Code send !'.america)
@@ -361,26 +444,131 @@ router.post("/sendResetPasswordCode", sendEmail, async (req, res) => {
     transporter.sendMail({
         from: `"${process.env.APP_NAME}" <${process.env.SMTP_USER}>`,
         to: email,
-        subject: 'Réinitialisation de votre mot de passe',
-        text: `Bonjour,\n\nVoici votre code de réinitialisation de votre mot de passe : ${code}\n\nUtilisez-le ici : ${req.protocol}://${req.get('host')}/update-password\n\nSi vous n'avez pas demandé ce code, ignorer cet email.`,
-        html: `<div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
-      <h2 style="color: #2c3e50;">Réinitialisation de votre mot de passe</h2>
-      <p>Bonjour,</p>
-      <p>Voici votre code de réinitialisation de votre mot de passe :</p>
-      <p style="font-size: 20px; font-weight: bold; color: #2c3e50; background: #f4f4f4; padding: 10px; display: inline-block; border-radius: 5px;">
-        ${code}
-      </p>
-      <p>Vous pouvez également cliquer sur le bouton ci-dessous pour finaliser la réinitialisation de votre mot de passe :</p>
-      <p>
-        <a href="${req.protocol}://${req.get('host')}/update-password" 
-           style="background: #ffae00ff; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px;">
-          Accèder a la page de validation
-        </a>
-      </p>
-      <p style="font-size: 14px; font-weight: bold; color: #ff0000ff ;margin-top: 10px;">
-        Si vous n'avez pas demandé ce code, ignorez cet email.
-      </p>
-    </div>`
+        subject: 'Réinitialisation de votre mot de passe - Confiancy',
+        text: `Bonjour,\n\nVoici votre code de réinitialisation de votre mot de passe : ${code}\n\nUtilisez-le ici : ${req.protocol}://${req.get('host')}/update-password\n\nSi vous n'avez pas demandé ce code, ignorez cet email.`,
+        html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <style>
+                body {
+                    font-family: 'Segoe UI', Arial, sans-serif;
+                    line-height: 1.6;
+                    color: #f0f0f0;
+                    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+                    margin: 0;
+                    padding: 0;
+                }
+                .container {
+                    max-width: 600px;
+                    margin: 20px auto;
+                    background: #1a1a1a;
+                    border-radius: 12px;
+                    overflow: hidden;
+                    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+                }
+                .header {
+                    background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+                    padding: 30px;
+                    text-align: center;
+                }
+                .content {
+                    padding: 30px;
+                }
+                .code {
+                    font-size: 24px;
+                    font-weight: bold;
+                    color: #FF9800;
+                    background: #2a2a2a;
+                    padding: 15px 25px;
+                    display: inline-block;
+                    border-radius: 8px;
+                    border: 1px solid #FF9800;
+                    letter-spacing: 3px;
+                    margin: 20px 0;
+                    font-family: 'Courier New', monospace;
+                }
+                .button {
+                    display: inline-block;
+                    background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+                    color: white !important;
+                    padding: 15px 30px;
+                    text-decoration: none;
+                    border-radius: 8px;
+                    font-weight: bold;
+                    margin: 20px 0;
+                    border: none;
+                    cursor: pointer;
+                    transition: transform 0.2s ease;
+                }
+                .button:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 5px 15px rgba(255, 152, 0, 0.3);
+                }
+                .warning {
+                    background: #3a3a3a;
+                    border-left: 4px solid #f44336;
+                    padding: 15px;
+                    margin: 20px 0;
+                    border-radius: 0 8px 8px 0;
+                }
+                .footer {
+                    background: #2a2a2a;
+                    padding: 20px;
+                    text-align: center;
+                    font-size: 12px;
+                    color: #888;
+                    border-top: 1px solid #333;
+                }
+                .security-tip {
+                    background: #1b5e20;
+                    border-left: 4px solid #4caf50;
+                    padding: 15px;
+                    margin: 20px 0;
+                    border-radius: 0 8px 8px 0;
+                    font-size: 14px;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1 style="color: white; margin: 0; font-size: 28px;">🔒 Confiancy</h1>
+                    <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0;">Réinitialisation de votre mot de passe</p>
+                </div>
+                
+                <div class="content">
+                    <h2 style="color: white;">Bonjour,</h2>
+                    <p>Vous recevez cet email car vous avez demandé à réinitialiser votre mot de passe sur Confiancy.</p>
+                    
+                    <p><strong>Votre code de réinitialisation est :</strong></p>
+                    <div class="code">${code}</div>
+                    
+                    <div class="security-tip">
+                        <p>💡 <strong>Conseil de sécurité :</strong> Choisissez un mot de passe fort avec au moins 12 caractères, incluant majuscules, minuscules, chiffres et symboles.</p>
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <a href="${req.protocol}://${req.get('host')}/update-password" class="button">
+                            🔄 Réinitialiser mon mot de passe
+                        </a>
+                    </div>
+                    
+                    <div class="warning">
+                        <p><strong>⚠️ Sécurité :</strong> Si vous n'avez pas demandé ce code, quelqu'un essaie peut-être d'accéder à votre compte. Ignorez cet email et contactez notre support si nécessaire.</p>
+                    </div>
+                </div>
+                
+                <div class="footer">
+                    <p>Cet email a été envoyé par Confiancy - Votre réseau de confiance</p>
+                    <p style="margin-top: 10px;">
+                        <a href="${req.protocol}://${req.get('host')}" style="color: #FF9800; text-decoration: none;">Confiancy.app</a>
+                    </p>
+                </div>
+            </div>
+        </body>
+        </html>`
     });
     console.log('[EMAIL-SEND] RESET MDP send !'.america)
 

@@ -36,6 +36,10 @@ db.serialize(() => {
         userId INTEGER NOT NULL PRIMARY KEY,
         avatar TEXT,
         
+        WeightedSum REAL DEFAULT 0,
+        WeightTotal REAL DEFAULT 0,
+        GivenCount INTEGER DEFAULT 0,
+
         Score INTEGER NOT NULL DEFAULT 50,
         Count INTEGER DEFAULT 0 CHECK(Count >= 0),
 
@@ -49,6 +53,7 @@ db.serialize(() => {
         targetId INTEGER NOT NULL,
         
         avis TEXT,
+        weight REAL DEFAULT 1,
         note INTEGER NOT NULL,
         date INTEGER NOT NULL DEFAULT (strftime('%s','now')),
         PRIMARY KEY (authorId, targetId)
