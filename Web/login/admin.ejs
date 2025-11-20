@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Administration</title>
+    <link rel="icon" href="../media/logoCircle.png">
+    <style>
+        body {
+            background-color: #0f0f0f;
+            color: #f0f0f0;
+            font-family: 'Segoe UI', sans-serif;
+            padding: 2rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #ffffff;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background-color: #1a1a1a;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            background-color: #2a2a2a;
+            margin: 0.5rem 0;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
+
+        form {
+            margin-top: 2rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        input {
+            padding: 0.6rem;
+            border: none;
+            border-radius: 6px;
+            background-color: #333;
+            color: #fff;
+            margin-bottom: 1rem;
+        }
+
+        button {
+            padding: 0.6rem;
+            background-color: #ff3c3c;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #e62e2e;
+        }
+
+        .status {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #00ff99;
+        }
+    </style>
+</head>
+
+<body>
+    <% if (user.id==1 || (user.badges && user.badges.staff === 1)) { %>
+        <div class="container">
+            <h1>👮‍♂️ Administration</h1>
+
+            <% const startsWithVowel=/^[aeiouyAEIOUY]/.test(user.username); const prefix=startsWithVowel ? "qu’" : "que "; %>
+                <p>Connecté en tant <%= prefix %><strong><%= user.username %></strong></p>
+                <p><a href="./admin/blacklist/manage">Gestion de la blacklist</a></p>
+
+                <form id="warnForm">
+                    <input type="id" name="id" id="IdInput" placeholder="Id de l'user" required>
+                    <input type="text" name="reason" id="reasonInput" placeholder="Raison du warn">
+                    <button type="submit">Avertir par email</button>
+                </form>
+                <form id="deleteReviewForm">
+                    <input type="id" name="userId" id="userInput" placeholder="Id de l'user victime" required>
+                    <input type="id" name="reviewerId" id="reviewerInput" placeholder="Id du reviewer" required>
+                    <button type="submit">Supprimer l'avis</button>
+                </form>
+
+                <div class="status" id="statusMessage"></div>
+        </div>
+
+        <script>
+            document.getElementById('warnForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const id = document.getElementById('IdInput').value.trim();
+                const reason = document.getElementById('reasonInput').value.trim() ?? null;
+                const res = await fetch('<%= url %>' + "/warn", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ id, reason })
+                });
+
+                const data = await res.ok;
+                const status = document.getElementById('statusMessage');
+
+                if (data) {
+                    status.textContent = "✅ User averti.";
+                    status.style.color = "#00ff99";
+                } else {
+                    status.textContent = "❌ " + (data.error || "Impossible d'avertir l'utilisateur.");
+                    status.style.color = "#ff6666";
+                }
+            });
+            
+            document.getElementById('deleteReviewForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const user = document.getElementById('userInput').value.trim();
+                const reviewer = document.getElementById('reviewerInput').value.trim();
+                const res = await fetch('<%= url %>' + user + "/" + reviewer + "/delete", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                });
+
+                const data = await res.ok;
+                const status = document.getElementById('statusMessage');
+
+                if (data) {
+                    status.textContent = "✅ Avis supprimé."
+                    status.style.color = "#00ff99";
+                } else {
+                    status.textContent = "❌ " + (data.error || "Impossible de supprimer l'avis.");
+                    status.style.color = "#ff6666";
+                }
+            })
+
+        </script>
+        <% } %>
+</body>
+
+</html>

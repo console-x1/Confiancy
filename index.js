@@ -34,7 +34,7 @@ app.set('views', path.join(__dirname, 'Web'));
 app.set('view engine', 'ejs');
 app.use('/api/auth', require('./Web/routes/userRoutesAuth.js'));
 app.use('/api/Oauth2', require('./Web/routes/Oauth2.js'))
-app.use('/admin', require('./Web/routes/blacklistRoutes.js'));
+app.use('/admin', require('./Web/routes/adminRoutes.js'));
 app.use('/api/reviews', require('./Web/routes/reviewRoutes.js'));
 app.use('/dashboard', require('./Web/routes/dashboardRoutes.js'));
 app.use('/', require('./Web/routes/publicRoutes.js'));

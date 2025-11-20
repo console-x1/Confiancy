@@ -208,6 +208,26 @@ async function sendEmail(authorId, targetId, note, comment, req) {
     });
 }
 
+async function email(to, subject, text, html) {
+    const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: parseInt(process.env.SMTP_PORT, 10),
+        secure: process.env.SMTP_SECURE === 'true',
+        auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS
+        }
+    });
+
+    await transporter.sendMail({
+        from: `"${process.env.APP_NAME}" <${process.env.SMTP_USER}>`,
+        to,
+        subject,
+        text,
+        html
+    })
+}
+
 router.get('/:targetId', async (req, res) => {
     const targetId = Number(req.params.targetId);
     if (!targetId) return res.status(400).json({ error: 'Invalid target id' });
@@ -516,5 +536,21 @@ router.post('/:targetId/delete', verifyToken, express.json(), async (req, res) =
         return res.status(500).redirect(`/user/${targetId}`);
     }
 });
+
+router.post('/:authorId/report', express.json(), async (req, res) => {
+    const authorId = Number(req.body.reviewerId);
+    if (!authorId) return res.status(400).redirect('/user/' + (req.params.targetId || ''));
+
+    const targetId = Number(req.params.targetId);
+    if (!targetId || Number.isNaN(targetId)) {
+        return res.status(400).redirect('/user/' + (req.params.targetId || ''));
+    }
+
+    const avis = await new Promise((resolve, reject) => {
+        db.get(`SELECT * FROM avis WHERE authorId = ? AND targetId = ?`, [authorId, targetId], (err, row) => err ? reject(err) : resolve(row));
+    });
+
+    email(process.env.SMTP_USER, 'REPORT', `L'avis de ${targetId} sur ${authorId} a été signaler. \nDétail de l'avis : \n${avis}`, null)
+})
 
 module.exports = router;
