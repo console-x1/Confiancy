@@ -117,4 +117,18 @@ router.get("/update-password", async (req, res) => {
     }
 })
 
+router.get('/emailUpdateNote', verifyToken, async (req, res) => {
+    try {
+
+        if (req.user.emailUpdateNote == true) db.run('UPDATE users SET emailUpdateNote = 0 WHERE userId = ?', [req.user.id])
+        else                                  db.run('UPDATE users SET emailUpdateNote = 1 WHERE userId = ?', [req.user.id])
+
+        res.status(200).redirect('./')
+
+    } catch (err) {
+        console.error("[USER] - Email Notif Error".red, err);
+        return res.status(500).json({ error: "Server error. Please try again later." });
+    }
+})
+
 module.exports = router;

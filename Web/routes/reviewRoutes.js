@@ -359,7 +359,8 @@ router.post('/:targetId', verifyToken, express.json(), async (req, res) => {
             `(weight=${weight.toFixed(3)}). Updated Score to ${newScore}% based on ${newCount} reviews.`.green
         );
 
-        sendEmail(authorId, targetId, rating, comment, req)
+        const email = await getAsync(`SELECT emailUpdateNote FROM users WHERE userId = ?`, [targetId])
+        if (email == 1) sendEmail(authorId, targetId, rating, comment, req)
 
         return res.status(200).redirect(`/user/${targetId}`);
     } catch (err) {

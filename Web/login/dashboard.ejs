@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tableau de bord</title>
-  <link rel="icon" href="../media/logoCircle.png">
+  <link rel="icon" href="<%= baseUrl %>/media/logoCircle.png">
 
     <style>
         html {
@@ -14,7 +14,7 @@
         }
     </style>
 
-    <script src="./javascript/tailwind.min.js"></script>
+    <script src="<%= baseUrl %>/javascript/tailwind.min.js"></script>
 
     <style type="text/tailwindcss">
         @layer base {
@@ -95,6 +95,18 @@
         class="py-3 px-4 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors duration-200 flex items-center justify-center gap-2">
         📚 Voir ma page publique
       </button>
+
+      <% if (user.emailUpdateNote == false) { %>
+        <button onclick="window.location.href='<%= baseUrl %>/dashboard/emailUpdateNote'"
+          class="py-3 px-4 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors duration-200 flex items-center justify-center gap-2">
+          🚀 Activer les notifications par email
+        </button>
+      <% } else { %>
+        <button onclick="window.location.href='<%= baseUrl %>/dashboard/emailUpdateNote'"
+          class="py-3 px-4 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors duration-200 flex items-center justify-center gap-2">
+          ⚠️ Désactiver les notifications par email
+      </button>
+      <% } %>
     </div>
 
     <div class="space-y-4">

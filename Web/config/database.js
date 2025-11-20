@@ -43,6 +43,7 @@ db.serialize(() => {
         Score INTEGER NOT NULL DEFAULT 50,
         Count INTEGER DEFAULT 0 CHECK(Count >= 0),
 
+        emailUpdateNote INTEGER DEFAULT 1,
         username TEXT UNIQUE NOT NULL
     )`, (err) => {
         if (err) console.log('[DB] '.red, err.message);

@@ -60,8 +60,9 @@ const verifyToken = (req, res, next) => {
             req.user.avatar = donnee && donnee.avatar ? donnee.avatar : null;
 
             req.user.timeCodeEmail = donneeLogin.timeCodeEmail;
-            req.user.github = donneeLogin && donneeLogin.githubId ? true : false
+            req.user.github = donneeLogin && donneeLogin.githubId   ? true : false
             req.user.discord = donneeLogin && donneeLogin.discordId ? true : false
+            req.user.emailUpdateNote = donnee.emailUpdateNote == 1  ? true : false
             req.user.badges = { staff: badges?.staff, verify: badges?.verify, job: badges?.job, premium: badges?.premium }
 
             function long(str, len) {
